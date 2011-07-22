@@ -1,0 +1,24 @@
+/**
+ * Fullscreen
+ */
+.openlayers-controls-semi_fullscreen {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  background: url("images/view-semi_fullscreen.png") top left no-repeat;
+  display: block;
+  float: right;
+  margin: 4px;
+  z-index: 1000;
+}
+
+.openlayers-controls-unsemi_fullscreen {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  background: url("images/unview-semi_fullscreen.png") top left no-repeat;
+  display: block;
+  float: right;
+  margin: 4px;
+  z-index: 1000;
+}

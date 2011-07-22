@@ -1,0 +1,13 @@
+<?php 
+// $Id$
+/**
+ * @file
+ *   Managing News test module
+ *   
+ * Managing News specific module for running tests
+ */
+define('MANAGINGNEWS_TEST_THEME', 'bluemarine');
+
+
+
+

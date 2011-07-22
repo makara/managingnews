@@ -1,0 +1,4 @@
+name = "MN Boxes"
+description = "Provides custom boxes plugins for Managing News."
+core = "6.x"
+dependencies[] = "boxes"

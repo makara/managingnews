@@ -1,0 +1,145 @@
+// $Id$
+
+This changelog reflects changes to the Managing News profile only. For changes
+in modules packaged with Managing News, consult the respective modules'
+changelogs.
+
+Managing News 1.2 2010-10-29
+----------------------------
+
+- Upgrade to Feeds 1.0-beta10
+- [#955820] Fix issue with simpleshare passing invalid characters to Twitter
+- [#886898] Remove preview button on feed node forms
+- [#811412] Fix border radius on pager in Mozilla
+- [#886894] Fix trash icons not showing for twitter icons
+- [#942174] Fix MN Core is overridden on fresh install
+- [#823970] Adjustment to twitter feeditem template
+- [#937662] Make delete button style consistent on node forms
+- [#954542] Fix issue where empty dashboard regions would not be available for
+  dropping
+- Remove fields from dashboard block displays of mn_news and mn_channels_news,
+  which prevented twitter feed fields from being displayed properly.
+- Upgrade to web_widgets working copy and removed custom CSS handling.
+- Fix calls to t() in widget rendering.
+- [#932120] Geodata for Terms Assigned to Feeds Disappear when Feed Items are
+  Imported
+- Add tests for feeds and tags.
+- Change install order to fix issue where geo info would not be imported with
+  terms from mn_world.
+- New/improved automated tests
+- Fix issue where example tag is not applied on example channel after install.
+- Adjust weight and views display name of feeds page.
+- [#931188] Fix number of items shown in channel maps is inconsistent with
+  other maps
+- Adjust titles of KML Exports.
+- Use world-print from MapBox on print views.
+- Remove layerswitcherplus from mn_core.
+- Switch to default OpenLayers LayerSwitcher control.
+- Upgrade to openlayers slim 1.8
+- [#927844] Fix CSS float issue in IE7
+- Fix bug where webkit based browsers would not see options on the dashboard
+  block browser.
+- Move preprocessers for altering the dashboard from theme to mn_core.
+- [#927830] Fix users with admin role cannot use the Full HTML input format
+- Export administer blocks perm so admins can edit boxes on the dashboard.
+- [#927772] Fix users with admin role cannot edit dashboard
+
+Managing News 1.1 2010-09-28
+----------------------------
+
+- Managing News 1.1 release.
+
+Managing News 1.1 Beta 3, 2010-09-28
+------------------------------------
+
+- Upgrade to Data 1.0 alpha 14 - various bug fixes.
+- Upgrade to Jake 1.0 beta 14 - various bug fixes.
+- Fix notices in mn_widgets_block().
+- Fix notices in mn_core_form_alter().
+- Upgrade patch to CTools.
+
+Managing News 1.1 Beta 2, 2010-09-21
+------------------------------------
+
+- Upgrade Porter Stemmer.
+- Upgrade jQueryUI.
+- Upgrade Extractor.
+
+Managing News 1.1 Beta 1, 2010-09-17
+------------------------------------
+
+- Upgraded to Feeds 1.0 Beta 7.
+- Added additional tests to mn_test: expiry of old items, items added to channels
+  never expire, items in trash always expire even if they are in a
+  channel, auto tagging.
+
+Managing News 1.1 Alpha 3, 2010-09-14
+-------------------------------------
+
+- Fix critical bugs in CTools that broke MN installation via Aegir.
+- Add mn_test module - basic integration tests for Managing News.
+
+Managing News 1.1 Alpha 2, 2010-09-12
+-------------------------------------
+
+- Updated rebuild.sh
+- Move all features and MN only custom modules to profile repository.
+- Upgrade to latest Feeds HEAD.
+
+Managing News 1.1 Alpha 1, 2010-09-10
+-------------------------------------
+
+*
+We are using a new versioning pattern now. Instead of increasing the beta
+version, we increase the minor version. This reflects better the fact that
+our releases are usually feature releases and allows us to create preview
+releases using alpha and beta flags.
+*
+
+- Added rebuild.sh file.
+- Location vocabulary and Channels tags are merged into one vocabulary now. You
+  can now tag items manually with geo terms just like you used to do that with
+  plain terms and use plain terms in addition to geo terms for automatic
+  tagging.
+- Upgraded modules to latest versions.
+- Various bug fixes in underlying modules.
+
+Managing News 1.0 beta 10, 2010-08-12
+------------------------------------
+
+- Repackage for Drupal maintenance releases which fix security vulnerabilities.
+
+Managing News 1.0 beta 9, 2010-04-12
+------------------------------------
+
+- Updated to OpenLayers 2.0-alpha4
+- Added VERSION.txt.
+- Upgraded to Views 2.10.
+- Added customizable dashboard as the front page.
+- Added embedable widget feature.
+- Added trash feature to hide unwanted aggregated items.
+- Added the localization client to the package (disabled by default) for simple
+  interface localization.
+
+Managing News 1.0 beta 7, 2010-02-16
+------------------------------------
+
+- #612050 Improved channels feature.
+- #689434 Fixed SQL errors when searching for words with less than 3 characters.
+- Switched from SimplePie parser to Common Syndication parser. This should take
+  care of broken links when aggregating Google News.
+- Upgraded to OpenLayers 2.0 module. Simplifies map customizations.
+- Streamlined openlayers.js.
+- Ported Jake theme to Rubik+Designkit.
+
+Managing News 1.0 beta 6, 2009-11-19
+------------------------------------
+
+- Update to latest views_modes/PURL dependency.
+- Various fixes in included modules.
+- Added Drupal Queue to make file (not enabled).
+
+Managing News 1.0 beta 5, 2009-10-21
+------------------------------------
+
+- Initial release

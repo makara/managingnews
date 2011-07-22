@@ -1,0 +1,65 @@
+<?php
+// $Id$
+
+require_once(dirname(__FILE__) .'/mn_feeds.test');
+
+class MNTagsTestCase extends MNFeedsTestCase {
+  /**
+   * Describe this test.
+   */
+  public function getInfo() {
+    return array(
+      'name' => t('MN Tags'),
+      'description' => t('Test tagging functionality.'),
+      'group' => t('Managing News'),
+    );
+  }
+
+  public function test() {
+    // Ensure geotaxonomy terms were properly imported
+    $term_names = array('Vienna', 'Washington D.C.', 'Harare');
+    $terms = array();
+    foreach ($term_names as $name) {
+      $matches = taxonomy_get_term_by_name($name);
+      $terms[] = $term = $matches[0];
+      $this->assertEqual($term->name, $name, t('Found imported term %term.', array('%term' => $name)));
+      $this->assertLatLonForTerm($term);
+    }
+
+    // Run standard feed creation sequence.
+    $this->createFeedNodes();
+
+    // Ensure that feed items have inherited terms from their feed nodes.
+    $matches = taxonomy_get_term_by_name('USGS');
+    $term = $matches[0];
+    $count = db_result(db_query("SELECT COUNT(id) FROM {data_taxonomy} WHERE tid = %d AND data_table_name = 'feeds_data_syndication'", $term->tid));
+    $this->assertEqual($count, 25, t('Feed items inherited the term USGS from the Earthquake feed node.'));
+
+    // Ensure that categories are being parsed from the feed.
+    $matches = taxonomy_get_term_by_name('drupalcon cph');
+    $term = $matches[0];
+    $count = db_result(db_query("SELECT COUNT(id) FROM {data_taxonomy} WHERE tid = %d AND data_table_name = 'feeds_data_syndication'", $term->tid));
+    error_log($count);
+    $this->assertEqual($count, 3, t('Feed items were tagged with terms parsed from RSS categories.'));
+
+    // Ensure that GeoRSS terms have been created.
+    $matches = taxonomy_get_term_by_name('-43.4371 172.5902');
+    $term = $matches[0];
+    $this->assertLatLonForTerm($term);
+
+    // Ensure all terms still have geotaxonomy data.
+    foreach($terms as $term) {
+      $this->assertLatLonForTerm($term);
+    }
+  }
+
+  /**
+   * Checks if the given term has geotaxonomy data.
+   */
+  public function assertLatLonForTerm($term) {
+    $geoterm = geotaxonomy_get_term($term->tid);
+    $this->assertNotNull($geoterm['lat'], t('Found latitude for %term.', array('%term' => $term->name)));
+    $this->assertNotNull($geoterm['lon'], t('Found longitude for %term.', array('%term' => $term->name)));
+  }
+
+}

@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Migrate box type storage property from 'type' to 'display_type' to avoid
+ * conflict.
+ */
+function mn_boxes_update_6000() {
+  $ret = array();
+  foreach (boxes_load() as $delta => $box) {
+    $box_types = array('mn_boxes_feed', 'mn_boxes_search', 'mn_boxes_channel');
+    if ($box->export_type == 1 && in_array(get_class($box), $box_types)) {
+      $box->options['display_type'] = $box->options['type'];
+      $box->save();
+    }
+  }
+
+  return $ret;
+}

@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implementation of hook_ctools_plugin_api().
+ */
+function mn_boxes_ctools_plugin_api($module, $api) {
+  if ($module == 'boxes' && $api == 'plugins') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implementation of hook_boxes_plugins().
+ */
+function mn_boxes_boxes_plugins() {
+  $info = array();
+  $info['mn_boxes_default'] = array(
+    'title' => 'MN box',
+    'handler' => array(
+      'class' => 'mn_boxes_default',
+      'file' => 'mn_boxes_default.inc',
+      'path' => drupal_get_path('module', 'mn_boxes') .'/boxes',
+      'parent' => 'box',
+    ),
+  );
+  $info['mn_boxes_feed'] = array(
+    'title' => 'Feed box',
+    'handler' => array(
+      'class' => 'mn_boxes_feed',
+      'file' => 'mn_boxes_feed.inc',
+      'path' => drupal_get_path('module', 'mn_boxes') .'/boxes',
+      'parent' => 'mn_boxes_default',
+    ),
+  );
+  $info['mn_boxes_channel'] = array(
+    'title' => 'Channel box',
+    'handler' => array(
+      'class' => 'mn_boxes_channel',
+      'file' => 'mn_boxes_channel.inc',
+      'path' => drupal_get_path('module', 'mn_boxes') .'/boxes',
+      'parent' => 'mn_boxes_default',
+    ),
+  );
+  $info['mn_boxes_search'] = array(
+    'title' => 'Search box',
+    'handler' => array(
+      'class' => 'mn_boxes_search',
+      'file' => 'mn_boxes_search.inc',
+      'path' => drupal_get_path('module', 'mn_boxes') .'/boxes',
+      'parent' => 'mn_boxes_default',
+    ),
+  );
+  return $info;
+}

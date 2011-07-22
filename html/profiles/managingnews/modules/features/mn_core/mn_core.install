@@ -1,0 +1,218 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function mn_core_install() {
+  // mn_core replaces mn_aggregator, migrate variable.
+  $location_vocab = variable_get('mn_aggregator_location_vocab', 1);
+  $location_vocab = variable_set('mn_core_location_vocab', $location_vocab);
+  variable_del('mn_aggregator_location_vocab');
+  drupal_install_schema('mn_core');
+
+  // On install of MN profile, mn_core is installed after the creation
+  // of user 1. Set the mn_welcome flag for user 1 by hand, rather than
+  // through hook_user. (See mn_user()).
+  $account = user_load(1);
+  user_save($account, array('mn_welcome' => TRUE));
+}
+
+/**
+ * Implementation of hook_uninstall();
+ */
+function mn_core_uninstall() {
+  drupal_uninstall_schema('mn_core');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function mn_core_schema() {
+  // Install data tables.
+  include_once('mn_core.data_default.inc');
+  $tables = mn_core_data_default();
+  $schema = array();
+  foreach ($tables as $name => $table) {
+    $schema[$name] = $table->table_schema;
+  }
+  return $schema;
+}
+
+/**
+ * Implementation of hook_update_N().
+ */
+function mn_core_update_6001() {
+  _drupal_install_module('purl');
+  module_enable(array('purl'));
+  return array();
+}
+
+/**
+ * Implementation of hook_update_N().
+  */
+function mn_core_update_6002() {
+  // Remove variable that might still be in place from MN Channels.
+  variable_del('feeds_data_syndication_handler');
+  // Disable mn_share in favor of new simpleshare
+  module_disable(array('mn_share'));
+  drupal_uninstall_module('mn_share');
+  _drupal_install_module('simpleshare');
+  module_enable(array('simpleshare'));
+  _drupal_install_module('mapbox');
+  module_enable(array('mapbox'));
+  _drupal_install_module('context_layouts');
+  module_enable(array('context_layouts'));
+  module_enable(array('designkit'));
+
+  // Migrate to new data_taxonomy module.
+  if (module_exists('data_node')) {
+    _drupal_install_module('data_taxonomy');
+    module_enable(array('data_taxonomy'));
+  }
+  db_query("INSERT INTO {data_taxonomy}(id, data_table_name, tid) SELECT id, 'feeds_data_syndication', tid FROM {data_table_term}");
+  db_drop_table($ret, 'data_table_term');
+
+  // Migrate item-channel relations from data_node to data_taxonomy.
+  $data = array('name' => 'Channel tags', 'required' => 1, 'relations' => 0, 'tags' => 1, 'nodes' => array('channel' => 1), 'help' => 'Articles with these tags will appear in this channel.');
+  taxonomy_save_vocabulary($data);
+  variable_set('mn_core_tags_vocab', $data['vid']);
+  if (db_table_exists('data_table_node') && module_exists('data_taxonomy')) {
+    $result = db_query("SELECT nid, vid, title FROM {node} WHERE type = 'channel'");
+    while ($node = db_fetch_object($result)) {
+      $edit = array(
+        'name' => strtolower($node->title),
+        'vid' => $data['vid'],
+      );
+      taxonomy_save_term($edit);
+      db_query("INSERT INTO {data_taxonomy}(id, data_table_name, tid) SELECT id, 'feeds_data_syndication', %d FROM {data_table_node} WHERE nid = %d", $edit['tid'], $node->nid);
+      db_query("INSERT INTO {term_node}(nid, vid, tid) VALUES(%d, %d, %d)", $node->nid, $node->vid, $edit['tid']);
+    }
+  }
+  if (module_exists('data_node')) {
+    module_disable(array('data_node'));
+    drupal_uninstall_module('data_node');
+  }
+
+  // Add "edit data taxonomy relations" to authenticated user role.
+  $permissions = db_fetch_object(db_query("SELECT pid, perm FROM {permission} WHERE rid = 2"));
+  $perm = explode(', ', $permissions->perm);
+  $perm[] = 'edit data taxonomy relations';
+  $permissions->perm = implode(', ', $perm);
+  drupal_write_record('permission', $permissions, 'pid');
+
+  // Flip toggle for a cache clear on cron later. See mn_core_cron().
+  variable_set('mn_core_clear_all_caches', TRUE);
+
+  return array();
+}
+
+/**
+ * Implementation of hook_update_N().
+ * Changes for beta 9 release
+ */
+function mn_core_update_6003() {
+  _drupal_install_module('boxes');
+  module_enable(array('boxes'));
+  _drupal_install_module('spaces');
+  module_enable(array('spaces'));
+  _drupal_install_module('spaces_dashboard');
+  module_enable(array('spaces_dashboard'));
+  _drupal_install_module('votingapi');
+  module_enable(array('votingapi'));
+  _drupal_install_module('mark');
+  module_enable(array('mark'));
+  _drupal_install_module('mn_boxes');
+  module_enable(array('mn_boxes'));
+  _drupal_install_module('web_widgets');
+  module_enable(array('web_widgets'));
+  _drupal_install_module('mn_widgets');
+  module_enable(array('mn_widgets'));
+  _drupal_install_module('jquery_ui');
+  module_enable(array('jquery_ui'));
+
+  // Add "mark items" to admins.
+  $permissions = db_fetch_object(db_query("SELECT pid, perm FROM {permission} WHERE rid = 3"));
+  $perm = explode(', ', $permissions->perm);
+  $perm[] = 'mark items';
+  $permissions->perm = implode(', ', $perm);
+  drupal_write_record('permission', $permissions, 'pid');
+
+
+  // This method flushes all caches EXCEPT for the theme one because we are in an "update environment"
+  // and thus flushing the theme cache RESETS all themes to disabled
+  drupal_flush_all_caches();
+  // We need to flush the theme cache though, because we add a new CSS file and change the info.
+  // So, we call the avoided function anyway.
+  system_theme_data();
+  // All themes are now disabled, as warned by the comments in drupal_flush_all_caches(). We thus
+  // reenable the default theme. If an overridden theme was in use it should just be reenabled
+  // manually.
+  db_query("UPDATE {system} SET status = 1 WHERE type = 'theme' and name = 'jake'");
+
+  // Increased weight allows altering the title of 'dashboard' menu item.
+  db_query("UPDATE {system} SET weight = 25 WHERE name = 'mn_core'");
+
+  return array();
+}
+
+/**
+ * General changes for beta 10 release.
+ */
+function mn_core_update_6004() {
+  module_disable(array('spaces'));
+  drupal_uninstall_module('spaces');
+
+  return array();
+}
+
+/**
+ * Vocabulary migration.
+ */
+function mn_core_update_6005() {
+  $location_vid = variable_get('mn_core_location_vocab', 1);
+  $channels_vid = variable_get('mn_core_tags_vocab', 2);
+  // Mark all terms from location vocabulary as lookup terms.
+  db_query("INSERT INTO {extractor_lookup} (tid) SELECT td.tid FROM {term_data} td WHERE td.vid = %d", $location_vid);
+  // Move all terms to channel tags to location vocabulary, remove it.
+  db_query("UPDATE {term_data} SET vid = %d WHERE vid = %d", $location_vid, $channels_vid);
+  db_query("DELETE FROM {vocabulary} WHERE vid = %d", $channels_vid);
+  // Make the location vocabulary the new tags vocabulary.
+  db_query("DELETE FROM {vocabulary} WHERE module = 'features_tags' AND vid != %d", $location_vid);
+  db_query("UPDATE {vocabulary} SET name = 'Tags', module = 'features_tags' WHERE vid = %d", $location_vid);
+  if (function_exists('taxonomy_features_rebuild')) {
+    taxonomy_features_rebuild('mn_core');
+  }
+  // Enable geo taxonomy for features tags.
+  variable_set('geotaxonomy_vocabularies', array('features_tags' => 1));
+  return array();
+}
+
+/**
+ * Disable features that feeds enables during update.
+ */
+function mn_core_update_6006() {
+  $ret = array();
+  module_disable(array('feeds_news', 'feeds_import', 'feeds_fast_news'));
+  drupal_uninstall_module('feeds_news');
+  drupal_uninstall_module('feeds_import');
+  drupal_uninstall_module('feeds_fast_news');
+  // Suppress Feeds' messages of replacement features.
+  drupal_get_messages('status');
+  return $ret;
+}
+
+/**
+ * Add a keep flag.
+ */
+function mn_core_update_6007() {
+  $ret = array();
+  $spec = array(
+    'type' => 'int',
+    'size' => 'small',
+    'unsigned' => FALSE,
+    'default' => 0,
+  );
+  db_add_field($ret, 'feeds_data_syndication', 'keep', $spec);
+  db_add_index($ret, 'feeds_data_syndication', 'keep', array('keep'));
+  return $ret;
+}

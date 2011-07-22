@@ -1,0 +1,140 @@
+$Id$
+
+
+MANAGING NEWS INSTALLATION GUIDE
+
+
+REQUIREMENTS
+
+Managing News has been tested successfully with the following system:
+
+1 Apache (with mod_rewrite for clean urls)
+
+2 MySQL 5
+
+3 PHP 5.2 (32M memory limit / 30+ second max execution time)
+  To increase your PHP memory limit see http://drupal.org/node/207036
+
+Your mileage may vary with other configurations. See TUNING below.
+
+If you are upgrading an existing Managing News site please refer to UPGRADE.txt.
+
+
+INSTALLATION
+
+Assumes that you have downloaded Managing News from http://www.managingnews.com.
+This means that all required modules, themes and features are present.
+
+1 Follow installation instructions in Drupal's INSTALL.txt, when prompted for
+  installation profile, pick "Managing News"
+
+2 Make sure that you have set up your files directory with the proper permissions
+  http://drupal.org/node/394704
+
+3 Make sure to configure cron http://drupal.org/cron . Recommended update
+  frequency: 3 minutes.
+
+
+PACKAGING WITH DRUSH MAKE
+
+If you have not downloaded the full Managing News package from
+http://managingnews.com you can use drush to download all required modules,
+themes and features.
+
+Assumes basic knowledge of how to install and use drush commands.
+
+1 Install drush (if not yet present) and drush_make
+  http://drupal.org/project/drush
+  http://drupal.org/project/drush_make
+  Use patch http://drupal.org/files/issues/911568-1_drupalcode.patch
+
+2 Check out Managing News from Drupal CVS
+
+3 Change into Managing News directory and run rebuild.sh
+
+  Select "Build a full Managing News distribution".
+
+4 Copy and unpack the resulting zip file to your web directory.
+
+
+PACKAGING WITH DRUSH MAKE FOR DEVELOPMENT
+
+1 Install drush (if not yet present) and drush_make (see above)
+
+2 Get latest Drupal from drupal.org
+
+3 Change into Drupal's profile directory and check out Managing News from
+  Drupal CVS
+
+4 Change into Managing News directory and run rebuild.sh
+
+  Select "Rebuild Managing News in place".
+
+  NOTE: The make file in the Managing News - managingnews.make - may not contain
+  pointers to VCS repositories but releases. So setting Managing News up for
+  development may involve changing the managingnews.make file so that the
+  modules that you would like to modify are checked out from the repository
+  instead of downloaded as a release.
+
+
+SETUP TASKS
+
+Once you have installed Managing News, there are several tasks you may want
+to do to setup and configure your site.
+
+- Add your first RSS/Atom feed. Many popular websites have a link titled "RSS"
+  with further options for choosing the type of items you would like to
+  subscribe to.
+
+- Customize your site's name and mission text. Go to "Admin > Site information."
+
+- Customize your site's theme. You can upload a custom logo, print logo,
+  background image, and change your site's colors. Go to "Admin > Theme settings"
+  to make these changes.
+
+- Add other users to your site. Once you've added other users they can create
+  new feeds, save searches, and organize stories into channels.
+
+- Import RSS/Atom feeds from other sites: Go to "Admin > Import OPML" and upload
+  your subscription export file from Google Reader, Bloglines or any other
+  service that exports feed subscriptions in OPML format.
+
+
+TUNING
+
+Per default Managing News is configured to update 5 feeds per cron run. This
+number is low to ensure robust behavior on cron time even on slower servers.
+
+With this setting, a cron run should not exceed ~ 32MB of memory usage and ~ 30
+seconds of execution time.
+
+As soon as your Managing News is subscribed to more than 30 feeds, this setting
+may not show the desired performance.
+
+If you would like to improve the overall update frequency on feeds, follow these
+steps:
+
+1. Allow Managing News to use more memory, set the memory limit to e. g. 128 or
+   256 M
+
+2. Use drush http://drupal.org/project/drush for running cron. This eliminates
+   the PHP execution time limit and uses less memory.
+
+   myserver# drush cron
+
+3. Now you can up the number of feeds that are being processed per cron run:
+
+   // In your settings.php file.
+   // Set number of feeds to update per cron run, maximum number depending on
+   // the configuration in 1 and the time between cron runs.
+   $conf['feeds_schedule_num'] = 20;
+
+4. Go to admin/reports/dblog and observe the messages by "MN Core": Make sure
+   that "Page execution time" is within the period between cron runs and "Peak
+   memory usage" does not exceed the setting defind in step 1.
+
+As a general rule, more often and short cron runs are better. Tuning for around
+20 feeds per update seems to be a good compromise. Keep in mind, that the exact
+numbers are going to depend a lot on the kinds of feeds your Managing News is
+aggregating: are they slow to fetch? Do they have may items? Do items on these
+feeds have large text bodies?

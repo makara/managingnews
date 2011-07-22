@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8" ?><rss version="2.0" xml:base="http://developmentseed.org/blog/all" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Development Seed - Technological Solutions for Progressive Organizations</title>
+    <link>http://developmentseed.org/blog/all</link>
+    <description></description>
+    <language>en</language>
+          <item>
+    <title>Aegir 1.0 Release on Drupal 7 in Early 2011</title>
+    <link>http://developmentseed.org/blog/2010/sep/02/aegir-10-release-drupal-7-early-2011</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Plans for the Aegir 1.0 release and how we&amp;#039;ll get there        &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/aegir-one-drupal-rule-them-all&quot;&gt;Last week at DrupalCon Copenhagen&lt;/a&gt; &lt;a href=&quot;http://drupal.org/user/1274&quot;&gt;Antoine Beaupre&lt;/a&gt; and I shared our plans for the 1.0 release of the &lt;a href=&quot;http://www.aegirproject.org&quot;&gt;Aegir hosting system&lt;/a&gt;. After the &lt;a href=&quot;http://developmentseed.org/blog/2010/aug/04/aegir-04-alpha-9-release-out-bringing-multi-server-support-aegir&quot;&gt;0.4 release that we are currently working on&lt;/a&gt;, the project will start working towards a final 1.0 build, rather than head towards 0.5.&lt;/p&gt;
+
+&lt;p&gt;Our goal for Aegir has been to implement a hosting system with a stable documented API that provides a solid foundation for integration of other services. Once we hit the 0.4 release, we will have the infrastructure in place to support this. With our key goal met, we&#039;ve begun determining our must have features for a 1.0 release.&lt;/p&gt;
+
+&lt;h2&gt;Going Drupal 7&lt;/h2&gt;
+
+&lt;p&gt;Aegir 1.0 will be built on Drupal 7. Due to the commoditized nature of hosting infrastructure, we felt it would be impractical to have a stable release that requires additional investment whenever the API changes during development. Therefore our primary goal is to rewrite Aegir&#039;s user interface for Drupal 7 and release it as early as possible in the Drupal 7 lifecycle.&lt;/p&gt;
+
+&lt;p&gt;With this we hope to ensure that custom and contributed extensions to Aegir built for the 1.0 release will stay viable for as long as building Drupal 7 sites remains viable, allowing your investment in the platform to remain usable for upwards of two years.&lt;/p&gt;
+
+&lt;h2&gt;New features&lt;/h2&gt;
+
+&lt;p&gt;After focusing heavily on Aegir&#039;s backend in previous releases, we will be turn our attention to the user interface for the 1.0 release. We want this release to be the most lickable version of Aegir yet, with many user interface and workflow improvements.&lt;/p&gt;
+
+&lt;p&gt;We plan to implement new functionality to ease and automate issues surrounding &lt;a href=&quot;http://developmentseed.org/blog/2009/jul/09/development-staging-production-workflow-problem-drupal&quot;&gt;&#039;Development to Staging to Production&#039; workflow problems&lt;/a&gt; felt by our users. We&#039;ll further integrate with &lt;a href=&quot;http://drupal.org/project/drush_make&quot;&gt;Drush make&lt;/a&gt;, allowing Aegir to subscribe to new releases and automatically download them when a new one becomes available. This will allow you to migrate sites to the latest version literally with a click of a button.&lt;/p&gt;
+
+&lt;p&gt;The 1.0 release will also focus heavily on interoperability. We will rebuild the hostmaster install profile to &lt;a href=&quot;http://drupal.org/project/kit&quot;&gt;Kit specification&lt;/a&gt;, replace custom listing code with &lt;a href=&quot;http://drupal.org/project/views&quot;&gt;Views&lt;/a&gt; (something which is &lt;a href=&quot;http://drupal.org/node/588728#comment-3347858&quot;&gt;already in progress&lt;/a&gt;), and integrate more closely with &lt;a href=&quot;http://drupal.org/project/features&quot;&gt;Features&lt;/a&gt;, &lt;a href=&quot;http://drupal.org/project/context&quot;&gt;Context&lt;/a&gt;, and &lt;a href=&quot;http://drupal.org/project/spaces&quot;&gt;Spaces&lt;/a&gt;. This will simplify our code base and allow for useful functionality like the ability to create SSL sites per client and possibly integrate &lt;a href=&quot;http://openatrium.com/&quot;&gt;Open Atrium&lt;/a&gt; features with Aegir.&lt;/p&gt;
+
+&lt;p&gt;We are open to feature suggestions from our users for the 1.0 release. If you have a request that would improve your experience with Aegir, please send it to &lt;a href=&quot;http://twitter.com/aegirproject&quot;&gt;@aegirproject&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Finalizing the 0.4 release&lt;/h2&gt;
+
+&lt;p&gt;We are close to wrapping up the 0.4 release cycle. Once we have completed DNS slave server support (master support already works), we will be feature complete and will start releasing betas in preparation for completing 0.4. We hope to have this functionality completed in the next few weeks.&lt;/p&gt;
+
+&lt;p&gt;Slides from the DrupalCon session &lt;a href=&quot;http://www.slideshare.net/devseed/aegir-one-drupal-to-rule-them-all&quot;&gt;Aegir: One Drupal to Rule them All&lt;/a&gt; are up, and we&#039;ll post a link to a video of the session here once it&#039;s online.&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/sep/02/aegir-10-release-drupal-7-early-2011#comments</comments>
+ <category domain="http://developmentseed.org/tags/aegir">Aegir</category>
+ <category domain="http://developmentseed.org/tags/drupal">Drupal</category>
+ <category domain="http://developmentseed.org/tags/drupalcon-cph">drupalcon cph</category>
+ <category domain="http://developmentseed.org/tags/hosting">hosting</category>
+ <category domain="http://developmentseed.org/tags/release">release</category>
+ <category domain="http://developmentseed.org/channel/drupal-planet">Drupal planet</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1181 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Week in DC Tech: August 30th Edition </title>
+    <link>http://developmentseed.org/blog/2010/aug/30/week-dc-tech-august-30th-edition</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    One Laptop Per Child, open government, and the semantic web this week in Washington, DC         &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;&lt;img src=&quot;http://developmentseed.org/sites/developmentseed.org/files/dctech2_0_0.png&quot; alt=&quot;Week in DC Technology&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;With Labor Day right around the corner, this is unfortuantely the last &quot;real&quot; week of summer, and in tune with that, it is a pretty quiet one in Washington, DC. There are several interesting technology events schedules, with our picks below and a full listing over at &lt;a href=&quot;http://www.dctechevents.com/&quot;&gt;DC Tech Events&lt;/a&gt;. Have a great week!&lt;/p&gt;
+
+&lt;h2&gt;Monday, August 30th&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;12:30 - 2:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://technologysalon.org/2010/08/olpc-in-south-america-update.html?utm_source=Technology+Salon+Announcements&amp;amp;utm_campaign=7a8fcd8dcb-OLPC_Salon_2010&amp;amp;utm_medium=email&quot;&gt;&lt;strong&gt;Technology Salon: OLPC in South America Update&lt;/strong&gt;&lt;/a&gt;: Interested in hearing how the &lt;a href=&quot;http://laptop.org/en/&quot;&gt;One Laptop Per Child project&lt;/a&gt; has advanced in Uruguay, Paraguay, and Peru since the program launched five years ago? This discussion will look at how the project is going specifically in South America, while also comparing it to implementations in Europe and Asia.&lt;/p&gt;
+
+&lt;h2&gt;Tuesday, August 31&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;7:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.meetup.com/Open-Government-Book-Club/calendar/14032580/&quot;&gt;&lt;strong&gt;Open Government Book Club&lt;/strong&gt;&lt;/a&gt;: In its first ever get together, this group will discuss some of the big questions around open government as well as examples of open government today. Be prepared to talk about a future reading list as well.&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/30/week-dc-tech-august-30th-edition#comments</comments>
+ <category domain="http://developmentseed.org/tags/washington-dc">Washington DC</category>
+ <category domain="http://developmentseed.org/tags/week-dc-tech">week in dc tech</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1180 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Announcing aegirproject.org!</title>
+    <link>http://developmentseed.org/blog/2010/aug/25/announcing-aegir-project-dot-org</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Aegir&amp;#039;s new home, release updates, and DrupalCon        &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;The &lt;a href=&quot;http://groups.drupal.org/aegir-hosting-system&quot;&gt;Aegir Project&lt;/a&gt; has just launched its new home - &lt;a href=&quot;http://aegirproject.org&quot;&gt;aegirproject.org&lt;/a&gt;. Right now this site is just a placeholder, but we&#039;d like to turn this space into a resource for documentation, release announcements, and community discussion. We&#039;d love to hear about your ideas for what you would like to see on the site - please send ideas to &lt;a href=&quot;http://twitter.com/aegirproject&quot;&gt;@aegirproject&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://farm5.static.flickr.com/4115/4920942958_62c114b7c6.jpg&quot; alt=&quot;First look at the new aegirproject.org&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Development on Aegir has been advancing quickly this summer. Earlier this month we put out the Aegir 0.4 Alpha 9 release, which added &lt;a href=&quot;http://developmentseed.org/blog/2010/aug/04/aegir-04-alpha-9-release-out-bringing-multi-server-support-aegir&quot;&gt;features like multi-server support, a vastly simplified installation, and support for sites encrypted with SSL to the system&lt;/a&gt;, and we just &lt;a href=&quot;http://groups.drupal.org/node/89194&quot;&gt;announced the 0.4 Alpha 12 release&lt;/a&gt;, which contains bug fixes and usability improvements. The last major feature missing before we can consider Aegir 0.4 feature complete and start the beta cycle is the ability to host DNS for all your sites. This is a requirement to allow us to move sites between servers successfully.&lt;/p&gt;
+
+&lt;p&gt;I&#039;ll be &lt;a href=&quot;http://cph2010.drupal.org/sessions/aegir-one-drupal-rule-them-all&quot;&gt;presenting on Aegir&lt;/a&gt; at &lt;a href=&quot;http://cph2010.drupal.org/&quot;&gt;DrupalCon Copenhagen&lt;/a&gt; tomorrow, August 26th, at 1:30 pm in the Trellon Room with &lt;a href=&quot;http://drupal.org/user/1274&quot;&gt;Antoine Beaupré&lt;/a&gt;. We&#039;ll walk through Aegir and show off the new features that have been added over the last year, especially some of the multi-server magic like how to use Aegir to add additional web and database servers and migrate and clone sites between several servers. We&#039;ll also talk about our future plans for the project and share best practices around how to lessen the impact of the development -&amp;gt; staging -&amp;gt; production workflow problem by making use of tools such as &lt;a href=&quot;http://drupal.org/project/drush_make&quot;&gt;Drush make&lt;/a&gt; and &lt;a href=&quot;https://ds.openatrium.com/dsi/node/drupal.org/project/features&quot;&gt;Features&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;For those who have already consumed the Aegir koolaid (or beer, since Aegir, the Norse god of the ocean, is known for his love of beer), we will have a BoF at 4:00 pm tomorrow and after that, meet in the lobby to head out to our traditional Aegir dinner. This is always a great time to hang out in person and get to know the team better.&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/25/announcing-aegir-project-dot-org#comments</comments>
+ <category domain="http://developmentseed.org/tags/aegir">Aegir</category>
+ <category domain="http://developmentseed.org/tags/aegirprojectorg">aegirproject.org</category>
+ <category domain="http://developmentseed.org/tags/deployment">deployment</category>
+ <category domain="http://developmentseed.org/tags/drupal">Drupal</category>
+ <category domain="http://developmentseed.org/tags/drupalcon">drupalcon</category>
+ <category domain="http://developmentseed.org/tags/drupalcon-cph">drupalcon cph</category>
+ <category domain="http://developmentseed.org/tags/release">release</category>
+ <category domain="http://developmentseed.org/channel/drupal-planet">Drupal planet</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1178 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Open Atrium 1.0 Beta 8 Released</title>
+    <link>http://developmentseed.org/blog/2010/aug/25/open-atrium-10-beta-8</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Open Atrium goes Kit compliant        &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;Yesterday we released &lt;a href=&quot;http://openatrium.com/download&quot;&gt;Open Atrium 1.0 Beta 8&lt;/a&gt; (aka &quot;Seatbelts&quot;). This release makes some of the biggest changes to &lt;a href=&quot;http://openatrium.com&quot;&gt;Open Atrium&lt;/a&gt; since the Beta 4 release last winter, focusing on compatibility, accessibility, and stability.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://farm5.static.flickr.com/4098/4927076236_c946f3cab2.jpg&quot; alt=&quot;Open Atrium goes Kit compliant in new release&quot; /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Compatibility&lt;/h2&gt;
+
+&lt;p&gt;Eight features in Open Atrium are now &lt;a href=&quot;http://drupal.org/project/kit&quot;&gt;Kit compliant&lt;/a&gt;. Kit compliance pushes Open Atrium to a new level of modularity, allowing any of the eight features to be used in other distributions or your own projects with fewer dependencies and less hassle than before. Changes related to Kit have also improved the compatibility of Open Atrium on several other fronts:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The &lt;a href=&quot;http://code.developmentseed.org/deprecated-seed&quot;&gt;Seed module&lt;/a&gt; that provided a grab-bag of UI tweaks and utilities has been deprecated in favor of several projects that accomplish the same jobs and better. &lt;a href=&quot;http://drupal.org/project/imagecache_profiles&quot;&gt;ImageCache Profiles&lt;/a&gt; now provides the user picture thumbnails, &lt;a href=&quot;http://drupal.org/project/nodeformcols&quot;&gt;Node form columns&lt;/a&gt; makes it easy to rearrange content forms, and &lt;a href=&quot;http://drupal.org/project/itweak_upload&quot;&gt;iTweak Upload&lt;/a&gt; streamlines the attachment UI.&lt;/li&gt;
+&lt;li&gt;A pattern of optional enhancement has been adopted across Open Atrium features, allowing you to use them in their simplest incarnations and then progressively add on niceties like &lt;a href=&quot;http://drupal.org/project/og&quot;&gt;Organic Groups&lt;/a&gt; and &lt;a href=&quot;http://drupal.org/project/spaces&quot;&gt;Spaces&lt;/a&gt; integration, &lt;a href=&quot;http://drupal.org/project/reldate&quot;&gt;Relative date&lt;/a&gt; display, and &lt;a href=&quot;http://drupal.org/project/crayon&quot;&gt;Crayon&lt;/a&gt; colored popups/condensed displays in lists.&lt;/li&gt;
+&lt;/ul&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/25/open-atrium-10-beta-8#comments</comments>
+ <category domain="http://developmentseed.org/tags/drupal">Drupal</category>
+ <category domain="http://developmentseed.org/tags/features">features</category>
+ <category domain="http://developmentseed.org/tags/kit">kit</category>
+ <category domain="http://developmentseed.org/tags/open-atrium">open atrium</category>
+ <category domain="http://developmentseed.org/tags/release">release</category>
+ <category domain="http://developmentseed.org/channel/drupal-planet">Drupal planet</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1179 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Week in DC Tech: August 23rd Edition </title>
+    <link>http://developmentseed.org/blog/2010/aug/23/week-dc-tech-august-23rd-edition</link>
+    <description>&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;&lt;img src=&quot;http://developmentseed.org/sites/developmentseed.org/files/dctech2_0_0.png&quot; alt=&quot;Week in DC Technology&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It&#039;s hard to believe, but it&#039;s already the last week in August and of the last in the summer. Like much of the city, much of our team is taking advantage of the slow down for a quick vacation or is at &lt;a href=&quot;http://developmentseed.org/blog/2010/aug/20/proost-were-headed-drupalcon-copenhagen&quot;&gt;DrupalCon Copenhagen&lt;/a&gt;. If you&#039;re still around, there are some technology events happening this week. It&#039;s also still &lt;a href=&quot;http://dcist.com/2010/08/beer_glorious_beer.php&quot;&gt;Beer Week&lt;/a&gt;, and considering the gorgeous weather we&#039;re having, it&#039;s a great time to head to an outdoor patio for a cold one.&lt;/p&gt;
+
+&lt;h2&gt;Tuesday, August 24&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;7:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nscodernightdc.com/&quot;&gt;&lt;strong&gt;NSCoderNightDC&lt;/strong&gt;&lt;/a&gt;: If you do any Mac or iPhone development or want to get into it, check out this meetup where people gather to talk Cocoa, Cocoa Touch, Objective-C, and the latest Mac and iPhone news.&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/23/week-dc-tech-august-23rd-edition#comments</comments>
+ <category domain="http://developmentseed.org/tags/washington-dc">Washington DC</category>
+ <category domain="http://developmentseed.org/tags/week-dc-tech">week in dc tech</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1177 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Skål! We&#039;re Headed to DrupalCon Copenhagen</title>
+    <link>http://developmentseed.org/blog/2010/aug/20/proost-were-headed-drupalcon-copenhagen</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Excited to talk Drupal distros, Features, Feeds, Kit, and more        &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;In the next few days a good portion of our team will be traveling to Copenhagen, where more than 1,000 Drupal developers will be gathering for the &lt;a href=&quot;http://cph2010.drupal.org/&quot;&gt;latest DrupalCon&lt;/a&gt;. We&#039;re looking forward to catching up with folks on what they&#039;ve been up to since &lt;a href=&quot;http://sf2010.drupal.org/&quot;&gt;San Francisco&lt;/a&gt;, and particularly in talking about some of the recent work we&#039;ve been doing around smart development and management processes, Drupal distros, and aggregation in real-time.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://farm5.static.flickr.com/4081/4907999982_0014fd3af0.jpg&quot; alt=&quot;Drupal monsters head to Copenhagen&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;DrupalCons are always a lot of fun, and this one sounds like it will be especially interesting with more than &lt;a href=&quot;http://cph2010.drupal.org/sessions/timetable&quot;&gt;90 sessions&lt;/a&gt; spread across three days, the second ever &lt;a href=&quot;http://cph2010.drupal.org/news/core-developer-summit&quot;&gt;Core Developer summit&lt;/a&gt;, an &lt;a href=&quot;http://cph2010.drupal.org/unconference&quot;&gt;unconference&lt;/a&gt; and a &lt;a href=&quot;http://cph2010.drupal.org/code-sprint&quot;&gt;code sprint&lt;/a&gt;, and its very own beer - &lt;a href=&quot;http://morten.dk/blog/awesomesauce&quot;&gt;Awesomesauce&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Our Sessions&lt;/h2&gt;
+
+&lt;p&gt;We&#039;ll be participating in six sessions at the conference. The full schedule is on the &lt;a href=&quot;http://cph2010.drupal.org/sessions/timetable&quot;&gt;Drupalcon website&lt;/a&gt;, and all sessions will be recorded and posted on the site.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/drupal-distributions-dos-and-donts&quot;&gt;&lt;strong&gt;Drupal Distributions: The Dos and Don&#039;ts&lt;/strong&gt;&lt;/a&gt;: &lt;a href=&quot;developmentseed.org/team/jeff-miccolis&quot;&gt;Jeff&lt;/a&gt; will join &lt;a href=&quot;http://www.phase2technology.com/people/irakli&quot;&gt;Irakli&lt;/a&gt; from &lt;a href=&quot;http://www.phase2technology.com/&quot;&gt;Phase2 Technology&lt;/a&gt; to talk about our experience building and maintaining the Drupal distributions Open Atrium and Managing News and how modules like &lt;a href=&quot;http://drupal.org/project/ctools&quot;&gt;CTools&lt;/a&gt;, &lt;a href=&quot;http://drupal.org/project/features&quot;&gt;Features&lt;/a&gt;, &lt;a href=&quot;http://drupal.org/project/drush&quot;&gt;Drush&lt;/a&gt;, and others make this a lot easier. &lt;em&gt;Tuesday, 9:00 am, Valhalla Room&lt;/em&gt;. &lt;a href=&quot;http://www.slideshare.net/devseed/drupalcon-cphdistrosv2&quot;&gt;Slides here&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/go-real-time-pubsubhubbub-and-feeds&quot;&gt;&lt;strong&gt;Go Real-time with Pubsubhubub and Feeds&lt;/strong&gt;&lt;/a&gt;: &lt;a href=&quot;developmentseed.org/team/alex-barth&quot;&gt;Alex&lt;/a&gt; will present on &lt;a href=&quot;http://code.google.com/p/pubsubhubbub/&quot;&gt;PubSubHubbub&lt;/a&gt; (short PuSH), a publish/subscribe protocol for RSS and Atom feeds that allows for real-time aggregation, and how it can be used in Drupal with the &lt;a href=&quot;http://drupal.org/project/feeds&quot;&gt;Feeds&lt;/a&gt; and &lt;a href=&quot;http://drupal.org/project/push_hub&quot;&gt;PuSH Hub&lt;/a&gt; modules. &lt;em&gt;Wednesday, 9:00 am, Acquia Room&lt;/em&gt; &lt;a href=&quot;http://www.slideshare.net/devseed/go-real-time-with-pubsubhubbub-and-feeds&quot;&gt;Slides here&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/every-site-make-file&quot;&gt;&lt;strong&gt;For Every Site, a .Make File&lt;/strong&gt;&lt;/a&gt;: In this session Jeff will talk about how Drush and &lt;a href=&quot;http://drupal.org/project/drush_make&quot;&gt;.make files&lt;/a&gt; are changing how Drupal sites are built, and how they will increase your open source karma, let you never download views, cck and core again, and make sure that you never build a blog again. &lt;em&gt;Wednesday, 2:45 pm, Trellon Room&lt;/em&gt;. &lt;a href=&quot;http://www.slideshare.net/devseed/for-every-site-a-make-file&quot;&gt;Slides here&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/panel-managing-drupal-consulting-firm&quot;&gt;&lt;strong&gt;Panel: Managing a Drupal Consulting Firm&lt;/strong&gt;&lt;/a&gt;: In this panel &lt;a href=&quot;developmentseed.org/team/eric-gundersen&quot;&gt;Eric&lt;/a&gt;, along with the heads of six other Drupal shops, will talk about how they run their business, what works well, and what doesn&#039;t work at all. &lt;em&gt;Wednesday, 5:15 pm, Acquia Room&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/aegir-one-drupal-rule-them-all&quot;&gt;&lt;strong&gt;Aegir - One Drupal to Rule Them All!&lt;/strong&gt;&lt;/a&gt;: Development on &lt;a href=&quot;http://groups.drupal.org/hostmaster2&quot;&gt;Aegir&lt;/a&gt; - the provisioning system that lets you manage thousands of sites across concurrent instances of Drupal on as many servers as you need - has been super charged recently. In this talk, &lt;a href=&quot;http://developmentseed.org/team/adrian-rossouw&quot;&gt;Adrian&lt;/a&gt; will run through &lt;a href=&quot;http://developmentseed.org/blog/2010/aug/04/aegir-04-alpha-9-release-out-bringing-multi-server-support-aegir&quot;&gt;Aegir&#039;s new features&lt;/a&gt; and how you can get started using them. &lt;em&gt;Thursday, 1:30 pm, Microsoft Room&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://cph2010.drupal.org/sessions/backstage-drupal-localization&quot;&gt;&lt;strong&gt;Backstage with Drupal Localization&lt;/strong&gt;&lt;/a&gt;: &lt;a href=&quot;http://developmentseed.org/team/jose-reyero&quot;&gt;Jose&lt;/a&gt; will join &lt;a href=&quot;http://hojtsy.hu/&quot;&gt;Gabor&lt;/a&gt; in this session to talk about &lt;a href=&quot;http://drupal.org/project/l10n_client&quot;&gt;localization&lt;/a&gt; in Drupal, and specifically on &lt;a href=&quot;https://translate.openatrium.com/&quot;&gt;how we&#039;re using it to translate Open Atrium into 37 languages&lt;/a&gt;. &lt;em&gt;Thursday, 2:45 pm, VPS.net Room&lt;/em&gt;. &lt;a href=&quot;http://www.slideshare.net/devseed/backstage-with-drupal-localization-part-2&quot;&gt;Slides, Part 2&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/20/proost-were-headed-drupalcon-copenhagen#comments</comments>
+ <category domain="http://developmentseed.org/tags/conferences">conferences</category>
+ <category domain="http://developmentseed.org/tags/drupal">Drupal</category>
+ <category domain="http://developmentseed.org/tags/drupalcon">drupalcon</category>
+ <category domain="http://developmentseed.org/tags/drupalcon-cph">drupalcon cph</category>
+ <category domain="http://developmentseed.org/tags/presentations">presentations</category>
+ <category domain="http://developmentseed.org/channel/drupal-planet">Drupal planet</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1175 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Fast and Simple Color Customization with the World Glass Map Tileset </title>
+    <link>http://developmentseed.org/blog/2010/aug/19/fast-and-simple-color-customization-world-glass-map-tileset</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Transparent elements leave the color decision to you, and with textures there are infinite design possibilities        &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;Today on &lt;a href=&quot;http://mapbox.com/&quot;&gt;Mapbox.com&lt;/a&gt; we released a new world map tileset - &lt;a href=&quot;http://mapbox.com/tileset/world-glass&quot;&gt;World Glass&lt;/a&gt;. The main goal and unique feature of this map is fast and simple color customization. With its use of 24-bit PNG transparency, users can make the map fit well with the rest of their site simply by changing its background color.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;World Glass showing Africa with a chalkboard texture background&quot; src=&quot;http://farm5.static.flickr.com/4116/4908386122_d413128881.jpg&quot; /&gt;&lt;br /&gt;
+&lt;em&gt;World Glass map showing Africa with a chalkboard texture background.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Any color or even an image can be used, but darker or stronger backgrounds will work the best. All of the elements of the map are white with varying degrees of transparency, thus the map will appear invisible if put on a white or very light background.&lt;/p&gt;
+&lt;p&gt;Our first iteration of this concept was on &lt;a href=&quot;http://haitiaidmap.org&quot;&gt;HaitiAidMap.org&lt;/a&gt; where we used the different background colors of the map to help indicate different sections of the website. After the success of that implementation, we were excited to bring the possibilities of instant map customization to a general, whole-world map. &lt;/p&gt;
+&lt;div id=&#039;map&#039; style=&#039;height:360px;background:url(http://developmentseed.org/sites/developmentseed.org/files/glass-demo-bg.png);&#039;&gt;&lt;/div&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;The map is intended to be used as a general base map of the world. It features labels and borders for countries and provinces, labels for major cities (with national capitals marked by stars), and detailed land and water. It has 10 zoom levels-- 0 through 9.&lt;/p&gt;
+&lt;p&gt;To change the background of the map, simply apply a CSS background to any element that appears below the map tiles (in terms of z-index). For the demo on this page, I used the container div for the map:&lt;/p&gt;
+&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/19/fast-and-simple-color-customization-world-glass-map-tileset#comments</comments>
+ <category domain="http://developmentseed.org/tags/custom-maps">custom maps</category>
+ <category domain="http://developmentseed.org/tags/haiti">haiti</category>
+ <category domain="http://developmentseed.org/tags/map-tileset">map tileset</category>
+ <category domain="http://developmentseed.org/tags/mapbox">mapbox</category>
+ <category domain="http://developmentseed.org/tags/mapping">Mapping</category>
+ <category domain="http://developmentseed.org/tags/open-source">open source</category>
+ <category domain="http://developmentseed.org/channel/drupal-planet">Drupal planet</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1176 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Week in DC Tech: August 16th Edition </title>
+    <link>http://developmentseed.org/blog/2010/aug/17/week-dc-tech-august-16th-edition</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Macs, mobiles, and beer this week in Washington, DC         &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;&lt;img src=&quot;http://developmentseed.org/sites/developmentseed.org/files/dctech2_0_0.png&quot; alt=&quot;Week in DC Technology&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It may be August, but there is a lot going on this week. In addition to it being &lt;a href=&quot;http://washington.org/restaurantwk/&quot;&gt;Restaurant Week&lt;/a&gt; and the start of &lt;a href=&quot;http://www.washingtoncitypaper.com/blogs/youngandhungry/2010/08/05/get-ready-d-c-beer-week-2010-is-coming/&quot;&gt;Beer Week&lt;/a&gt;, there are also a lot of technology events happening. Below are ones that caught our eye, and you can check out the full calendar over at &lt;a href=&quot;http://www.dctechevents.com/&quot;&gt;DC Tech Events&lt;/a&gt;. Have a great week! (My apologies for the late posting! I blame the heat.)&lt;/p&gt;
+
+&lt;h2&gt;Tuesday, August 17&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;6:30 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.meetup.com/webcontentmavens/calendar/14059349/&quot;&gt;&lt;strong&gt;Making a Mobile Website&lt;/strong&gt;&lt;/a&gt;: This meetup will show you how to make a mobile version of your website so that it&#039;s accessible and attractive whether you use your computer or your smart phone to visit it. The talk will cover do-it-yourself options, online toolkits, hosted options, and reputable mobile design firms.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;7:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nscodernightdc.com/&quot;&gt;&lt;strong&gt;NSCoderNightDC&lt;/strong&gt;&lt;/a&gt;: Come out and join a discussion on Mac and iPhone development, Cocoa, and the latest Mac and iPhone news. &lt;a href=&quot;http://developmentseed.org/profile/justin-miller&quot;&gt;Justin&lt;/a&gt; will be there talking in part about the &lt;a href=&quot;http://developmentseed.org/blog/2010/aug/12/kml-parsing-library-released-apples-ios-platform&quot;&gt;KML parsing library he released last week for the iOS Platform&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;7:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.meetup.com/net2dc/calendar/14082042/&quot;&gt;&lt;strong&gt;NetSquared&#039;s SpeedGeek Show and Tell&lt;/strong&gt;&lt;/a&gt;: Want to play the field of website strategy? Come out for speed dating for geeks, where you&#039;ll run through several quick presentations on specific websites and their strategy and have time to give presenters your thoughts and feedback.&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/17/week-dc-tech-august-16th-edition#comments</comments>
+ <category domain="http://developmentseed.org/tags/washington-dc">Washington DC</category>
+ <category domain="http://developmentseed.org/tags/week-dc-tech">week in dc tech</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1173 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>KML Parsing Library Released for Apple&#039;s iOS Platform</title>
+    <link>http://developmentseed.org/blog/2010/aug/12/kml-parsing-library-released-apples-ios-platform</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Making KML simple for the iPad        &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;I&#039;ve been working this summer with the &lt;a href=&quot;http://mapbox.com&quot;&gt;MapBox&lt;/a&gt; team on bringing interactive mapping to the iPad (expect another post soon about this work :-) ). In addition to being able to package MapBox tile sets as base layer maps, we need to be able to visualize live data on these maps, so we are supporting &lt;a href=&quot;http://en.wikipedia.org/wiki/Keyhole_Markup_Language&quot;&gt;KML&lt;/a&gt; and &lt;a href=&quot;http://georss.org/Main_Page&quot;&gt;GeoRSS&lt;/a&gt;. These are each file formats for exchanging geographic information along with content.&lt;/p&gt;
+
+&lt;p&gt;GeoRSS is pretty straightforward - it&#039;s basically regular RSS but with a small amount of geographic information added in the form of extra tags such as &lt;code&gt;&amp;lt;georss:point&amp;gt;&lt;/code&gt;. KML, however, is a completely different sort of format, written from the ground up for geographic data. It&#039;s probably most commonly known as the format that &lt;a href=&quot;http://earth.google.com/&quot;&gt;Google Earth&lt;/a&gt; uses to exchange geo info. Beyond Google Earth, it has been used in some exciting applications from Development Seed&#039;s own &lt;a href=&quot;http://mapbox.com/tools/maps-stick&quot;&gt;Maps on a Stick&lt;/a&gt; tool to the Jane Goodall Institute&#039;s &lt;a href=&quot;http://gombeblog.janegoodall.org/&quot;&gt;Gombe Chimpanzee Blog&lt;/a&gt;, which attaches KML data to every blog entry as a way to give it context and allow the reader to explore the story a bit more.&lt;/p&gt;
+
+&lt;p&gt;Once I got started on the iPad work, however, I noticed that there basically was no parsing library for KML on Apple&#039;s iOS platform - iPhones and iPads. Google puts out the definitive library - &lt;a href=&quot;http://code.google.com/p/libkml/&quot;&gt;libkml&lt;/a&gt;. It&#039;s written in C++ (a minor setback), but it also depends on &lt;a href=&quot;http://expat.sourceforge.net/&quot;&gt;libexpat&lt;/a&gt;, something that exists on Mac OS X but not on iOS.&lt;/p&gt;
+
+&lt;p&gt;That aside, I thought that it would also be nice to have a Cocoa-native KML parsing library, something that speaks in native Objective-C types like &lt;code&gt;UIImage&lt;/code&gt; for icons and &lt;code&gt;UIColor&lt;/code&gt; for colors without the need for conversion. So I wrote one!&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/12/kml-parsing-library-released-apples-ios-platform#comments</comments>
+ <category domain="http://developmentseed.org/tags/georss">GeoRSS</category>
+ <category domain="http://developmentseed.org/tags/ios">iOS</category>
+ <category domain="http://developmentseed.org/tags/ipad">ipad</category>
+ <category domain="http://developmentseed.org/tags/kml-parsing">kml parsing</category>
+ <category domain="http://developmentseed.org/tags/mapbox">mapbox</category>
+ <category domain="http://developmentseed.org/tags/mapping">Mapping</category>
+ <category domain="http://developmentseed.org/tags/simple-kml">simple KML</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1172 at http://developmentseed.org</guid>
+  </item>
+  <item>
+    <title>Week in DC Tech: August 9th Edition </title>
+    <link>http://developmentseed.org/blog/2010/aug/09/week-dc-tech-august-9th-edition</link>
+    <description>&lt;div class=&quot;field field-type-text field-field-subtitle&quot;&gt;
+    &lt;div class=&quot;field-items&quot;&gt;
+            &lt;div class=&quot;field-item odd&quot;&gt;
+                    Drupal, start ups, and job fairs this week in Washington, DC         &lt;/div&gt;
+        &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#039;node-body&#039;&gt;&lt;p&gt;&lt;img src=&quot;http://developmentseed.org/sites/developmentseed.org/files/dctech2_0_0.png&quot; alt=&quot;Week in DC Technology&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It&#039;s the time of year in Washington, DC when everything quiets down, and the tech scene is no exception. There are a few tech events happening this week, but it will also be a good week to catch your breath and gear up for the onslaught of interesting events that will certainly be coming in September. We&#039;ll be doing just that after tonight&#039;s Drupal meetup.&lt;/p&gt;
+
+&lt;h2&gt;Monday, August 9&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;5:00 - 8:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.facebook.com/event.php?eid=142444785776282&quot;&gt;&lt;strong&gt;Street Soccer Fundraiser/Happy Hour&lt;/strong&gt;&lt;/a&gt;: &lt;a href=&quot;http://www.streetsoccerusa.org/&quot;&gt;Street Soccer USA&lt;/a&gt;, the organization organizing soccer teams for homeless individuals as part of their rehabilitation program and the organizers of last weekend&#039;s street soccer tournament, is holding a fundraiser/happy hour at the &lt;a href=&quot;http://www.yelp.com/search?find_desc=passenger&amp;amp;ns=1&amp;amp;find_loc=washington+dc&quot;&gt;Passenger&lt;/a&gt;. Grab a beer and help support Street Soccer!&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;7:00 - 9:00 pm&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://groups.drupal.org/node/85304&quot;&gt;&lt;strong&gt;Drupal Meetup&lt;/strong&gt;&lt;/a&gt;: Come out for this casual meetup to talk about Drupal - a leading open source platform - with local developers and users over a few cold beers.&lt;/p&gt;&lt;/div&gt;</description>
+     <comments>http://developmentseed.org/blog/2010/aug/09/week-dc-tech-august-9th-edition#comments</comments>
+ <category domain="http://developmentseed.org/tags/washington-dc">Washington DC</category>
+ <category domain="http://developmentseed.org/tags/week-dc-tech">week in dc tech</category>
+ <pubDate></pubDate>
+ <dc:creator>Development Seed</dc:creator>
+ <guid isPermaLink="false">1170 at http://developmentseed.org</guid>
+  </item>
+  </channel>
+</rss>

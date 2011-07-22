@@ -1,0 +1,53 @@
+$Id$
+
+
+MANAGING NEWS UPGRADE GUIDE
+
+
+MANUAL UPGRADE
+
+1) Read the notes on the bottom of this file.
+
+2) Log in as user 1 and put the site in offline mode.
+
+3) Back up your database.
+
+4) Unpack the new Managing News version in a new directory (don't try to
+   overwrite your existing site's source code).
+
+5) Copy your existing Managing News site's settings.php and files directory into
+   the corresponding places of your new site directory. Make sure you keep the
+   permissions consistent.
+
+6) Move your old site directory out of the way and move your new site directory
+   into your old site's place. You can alternatively use symbolic links or your
+   web server configuration to do this switch. The purpose in the end is that
+   when you point your browser to Managing News, it should be served from the
+   new code base.
+
+7) Point your browser to your Managing News site's update.php and step through
+   the interactive update process. Alternatively run drush updatedb.
+
+8) RUN CRON ONCE. This is particular to Managing News and important for clearing
+   all caches. You can run cron manually from admin/reports/status.
+
+
+AUTOMATIC UPGRADE WITH AEGIR
+
+Managing News can be upgraded (migrated) with Aegir just like any other Drupal
+site. No special measures need to be taken.
+
+http://groups.drupal.org/aegir-hosting-system
+
+
+IMPORTANT NOTES:
+
+Under some circumstances the theme may be disabled during the upgrade, simply
+visit admin/build/themes to bring it back.
+
+Any customizations to Views, Data tables, Feeds importers, Open Layers map
+configurations or similar that have been undertaken on the Managing News
+application before the upgrade may potentially conflict with the upgrade.
+Prepare to revert these changes to code and reconfigure them.
+
+To review changes to your Managing News application visit admin/build/features.

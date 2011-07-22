@@ -1,0 +1,46 @@
+<?php
+// $Id$
+
+require_once drupal_get_path('module', 'mn_test') . '/mn_web_test_case.php';
+
+class MNFeedsTestCase extends MnWebTestCase {
+  /**
+   * Describe this test.
+   */
+  public function getInfo() {
+    return array(
+      'name' => t('MN Feeds'),
+      'description' => t('Test core feed aggregation.'),
+      'group' => t('Managing News'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+    $this->loginAdmin();
+  }
+
+  public function test() {
+    $this->createFeedNodes();
+  }
+
+  public function createFeedNodes() {
+    // Import two RSS feeds
+    $edit = array(
+      'title' => 'Development Seed',
+      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'mn_test') . '/tests/feeds/devseed.rss',
+      'taxonomy[tags][1]' => 'Managing News Test, Washington D.C.',
+    );
+    $this->drupalPost('node/add/feed', $edit, 'Save');
+    $this->assertText('Created 10 items.', t('Succesfully imported items from first feed.'));    
+
+    $edit = array(
+      'title' => 'Development Seed',
+      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/earthquake-georss.atom',
+      'taxonomy[tags][1]' => 'Earthquake, USGS, Managing News Test',
+    );
+    $this->drupalPost('node/add/feed', $edit, 'Save');
+    $this->assertText('Created 25 items.', t('Succesfully imported items from second feed.'));    
+  }
+
+}

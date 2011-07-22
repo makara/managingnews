@@ -1,0 +1,7 @@
+; $Id$
+name = "Managing News test"
+description = "Provides a framework for unit and functional testing for Managing News."
+package = Development
+version = VERSION
+core = "6.x"
+dependencies[] = simpletest

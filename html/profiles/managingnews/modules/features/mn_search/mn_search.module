@@ -1,0 +1,161 @@
+<?php
+
+include_once('mn_search.features.inc');
+
+/**
+ * Clear search status cache.
+ */
+function mn_search_cron() {
+  cache_clear_all('mn_search_status', 'cache');
+}
+
+/**
+ * Get the search table status and cache.
+ */
+function mn_search_get_search_status($reset = FALSE) {
+  $cache = cache_get('mn_search_status');
+  if ($reset || !$cache || (!empty($cache->data['expires']) && time() > $cache->data['expires'])) {
+    // Only invoke data_search... we don't care about nodes, users, etc.
+    $status = module_invoke('data_search', 'search', 'status');
+    $status['expires'] = strtotime('+1 hours');
+    cache_set('mn_search_status', $status);
+    return $status;
+  }
+  return $cache->data;
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function mn_search_block($op = 'list', $delta = 0) {
+  switch ($op) {
+    case 'list':
+      $blocks = array();
+      $blocks['status']['info'] = t('Search index status');
+      return $blocks;
+    case 'view':
+      switch ($delta) {
+        case 'status':
+          if (user_access('administer mn')) {
+            $status = mn_search_get_search_status();
+            $remaining = isset($status['remaining']) ? $status['remaining'] : 0;
+            $total = isset($status['total']) ? $status['total'] : 0;
+
+            // Only show the block if there are items to be indexed.
+            if ($remaining > 0) {
+              $percentage = ((int)min(100, 100 * ($total - $remaining) / max(1, $total))) .'%';
+              $label = t('Search index');
+              $suffix = t('complete');
+              $output = "<label>{$label}</label> <strong>{$percentage}</strong> {$suffix}";
+              $output .= "<div class='description'>". l(t('Update now'), 'admin/reports/status/run-cron', array('query' => drupal_get_destination())) ."</div>";
+              return array('content' => $output);
+            }
+          }
+          break;
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function mn_search_help($path, $arg) {
+  switch ($path) {
+    case 'search':
+      $output = '<p>';
+      $output .= t('<em>Search</em> lets you find news stories that relate to your keywords. You can browse and view searches that users have saved in the left-hand sidebar.');
+      $output .= "</p>";
+      if (user_access('manage stored views')) {
+        $output .= "<ul>";
+        $output .= "<li>". t("After doing a search you can save it by clicking the <em>Save this search</em> button. You can optionally highlight the search to display on the frontpage of the site.") ."</li>";
+        $output .= "</ul>";
+      }
+      return $output;
+    break;
+  }
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ *
+ * Hiding search local tasks ('content', 'user', etc.)
+ */
+function mn_search_menu_alter(&$items) {
+  foreach ($items as $path => $item) {
+    if (strpos($path, 'search/') === 0 && $item['type'] == MENU_LOCAL_TASK) {
+      $items[$path]['type'] = MENU_CALLBACK;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_alter() for views_exposed_form.
+ *
+ * Alter the filter button label to say "Search"
+ */
+function mn_search_form_views_exposed_form_alter(&$form, $form_state) {
+  if ($form_state['view']->name == 'mn_news') {
+    $form['submit']['#value'] = t('Search');
+  }
+}
+
+/**
+ * Change wording in stored_views_form, hide it from front page.
+ */
+function mn_search_form_stored_views_form_alter(&$form, $form_state) {
+  if (!empty($_GET['search']) && $form['#save']) {
+    unset($form['description']);
+    unset($form['status']);
+    $form['submit']['#weight'] = -10;
+    $form['submit']['#value'] = t('Save this search');
+  }
+  // Unset form if we are not on a search page.
+  else {
+    $form = array();
+  }
+}
+
+/**
+ * Implementation of hook_views_pre_render().
+ */
+function mn_search_views_pre_render(&$view) {
+  if ($view->display_handler->display->display_plugin === 'page') {
+    $input = $view->get_exposed_input();
+    if (!empty($input['search'])) {
+      drupal_set_title(check_plain($input['search']));
+    }
+  }
+}
+
+
+function mn_search_openlayers_behaviors_info() {
+  $info = array();
+
+  $info['openlayers_behaviors_semi_fullscreen'] = array(
+    'name' => t('Add a semi-fullscreen button'),
+    'description' => t('View map semi-fullscreen'),
+    'callback' => 'mn_search_behaviors_process_semi_fullscreen',
+    'js_file' => drupal_get_path('module', 'mn_search') .'/js/behaviors.js',
+    'js_callback' => 'semi_fullscreen',
+  );
+
+  return $info;
+}
+
+/**
+ * Callback for OpenLayers Behaviors (Fullscreen)
+ *
+ * @param $behavoir
+ *   Data about behavoir
+ * @param $map
+ *   Map array
+ * @return
+ *   Behavior array
+ */
+function mn_search_behaviors_process_semi_fullscreen($behavior, &$map) {
+  drupal_add_css(drupal_get_path('module', 'mn_search') .'/mn_search.css', 'module');
+  return $behavior;
+}
+
+

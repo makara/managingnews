@@ -1,0 +1,120 @@
+<?php
+// $Id$
+
+require_once drupal_get_path('module', 'mn_test') . '/mn_web_test_case.php';
+
+class MnBasicTestCase extends MnWebTestCase {
+  /**
+   * Implementation of getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Managing News basics',
+      'description' => 'Install managing news and do the initial set up.',
+      'group' => 'Managing News',
+    );
+  }
+
+  function testWelcomePage() {
+		$this->loginAdmin();
+
+    // Import OPML and assert.
+    $file = $this->generateOPML();
+    $this->importFile('opml', $file);
+    $this->assertText('Created 1 feed node.');
+    $count = db_result(db_query("SELECT COUNT(*) FROM {feeds_source}"));
+    $this->assertEqual($count, 3, 'Found correct number of items.');
+
+    // Import a feed and then delete all items from it.
+    $this->drupalPost('node/3/import', array(), 'Import');
+    $this->assertText('Created 10 items.');
+    $this->drupalPost('node/3/delete-items', array(), 'Delete');
+    $this->assertText('Deleted all items except those included in a channel.');
+
+		// Imports a feed and then sets feed item dates for expiration.
+    $this->drupalPost('node/3/import', array(), 'Import');
+    $this->assertText('Created 10 items.');
+		$this->expireFeedItems(15);
+		$count = db_result(db_query("SELECT COUNT(*) FROM {feeds_data_syndication}"));
+		$this->assertEqual($count, 5, 'Deleted 5 expired feed items.');
+
+		// Creates a channel and then deletes all items except for those in the newly created channel.
+		$edit = array();
+		$edit['title'] = 'Drupal';
+		$edit['taxonomy[tags][1]'] = 'Drupal';
+		$this->drupalPost('node/add/channel', $edit, t('Save'));
+		$this->assertText('Channel Drupal has been created.');
+		$this->drupalPost('node/3/delete-items', array(), 'Delete');
+		$count = db_result(db_query("SELECT COUNT(*) FROM {feeds_data_syndication}"));
+		$this->assertEqual($count, 3, 'Deleted all items except those included in a channel.');
+		
+		// Moves a channel item to the trash and then expires it.
+		$this->drupalGet('node/4');
+		$this->clickLink('Remove');
+		$this->drupalPost($this->getURL(), array(), 'Remove');
+		$this->assertText('Removed');
+		$this->expireFeedItems(10);
+		$count = db_result(db_query("SELECT COUNT(*) FROM {feeds_data_syndication}"));
+		$this->assertEqual($count, 2, 'Removed expired channel item that was marked for deletion');
+		
+		// Tests to see if auto tagging is working correctly.
+		$count = db_result(db_query("SELECT COUNT(*) FROM {data_taxonomy}"));
+		$this->assertEqual($count, 14, 'Feed items auto tagged correctly.');
+  }
+
+  function generateOPML() {
+    $path = $GLOBALS['base_url'] .'/'. drupal_get_path('module', 'mn_test') .'/tests/feeds/';
+
+    $output =
+    '<?xml version="1.0" encoding="utf-8"?>
+    <opml version="1.1">
+    <head>
+      <title>Feeds test OPML</title>
+      <dateCreated>Fri, 16 Oct 2009 02:53:17 GMT</dateCreated>
+      <ownerName></ownerName>
+    </head>
+    <body>
+    <outline text="Feeds test group" >
+      <outline title="Development Seed - Technological Solutions for Progressive Organizations" text="" xmlUrl="'. $path .'devseed.rss" type="rss" />
+    </outline>
+    </body>
+    </opml>';
+
+    // UTF 8 encode output string and write it to disk
+    $output = utf8_encode($output);
+    $file = $this->absolute() .'/'. file_directory_path() .'/test-opml-'. $this->randomName() .'.opml';
+    $handle = fopen($file, 'w');
+    fwrite($handle, $output);
+    fclose($handle);
+    return $file;
+  }
+
+  function importFile($id, $file) {
+    $this->assertTrue(file_exists($file), 'Source file exists');
+    $edit = array(
+      'files[feeds]' => $file,
+    );
+    $this->drupalPost('import/'. $id, $edit, 'Import');
+  }
+
+	function expireFeedItems($id) {
+		$old_timestamp = time() - (300 * 24 * 60 * 60);
+		
+		// Sets timestamp column for 5 of the feed items to a date more than 12 weeks from current time.
+		db_query("UPDATE {feeds_data_syndication} SET timestamp = %s WHERE id > %d", $old_timestamp, $id);
+		
+		// Schedules feeds_importer_expire to run during next cron then runs cron.
+		db_query("UPDATE {job_schedule} SET next = 0 WHERE callback = 'feeds_importer_expire' AND type = 'syndication'");
+		$this->runCron();
+	}
+	
+	function runCron() {
+		$this->drupalLogout();
+		$this->drupalGet('/cron.php');
+		$this->loginAdmin();
+	}
+
+  public function absolute() {
+    return realpath(getcwd());
+  } 
+}

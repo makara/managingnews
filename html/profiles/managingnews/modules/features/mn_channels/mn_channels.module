@@ -1,0 +1,135 @@
+<?php
+
+include_once('mn_channels.features.inc');
+
+/**
+ * Implementation of hook_help().
+ */
+function mn_channels_help($path, $arg) {
+  switch ($path) {
+    case 'channels':
+      $output = '<p>';
+      $output .= t('<em>Channels</em> are groups of related stories. You can view the stories in a channel by clicking on its title in the left-hand sidebar.');
+      $output .= "</p>";
+      if (node_access('create', 'channel')) {
+        $output .= "<ul>";
+        $output .= "<li>". t("!create a new channel. Choose one or more tags for the channel and stories with any of the those tags will be included.", array('!create' => l(t('Create'), 'node/add/channel'))) ."</li>";
+        $output .= "</ul>";
+      }
+      return $output;
+    break;
+  }
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function mn_channels_enable() {
+  // Create an example channel.
+  $nid = db_result(db_query_range("SELECT nid FROM {node} WHERE type = 'channel'", 0, 1));
+  if (!$nid) {
+    global $user;
+    $node = new stdClass();
+    $node->uid = $user->uid;
+    $node->title = "Example channel";
+    $node->type = 'channel';
+    $node->body = "You can collect news into a channel. Users can read this channel and subscribe to it. This is an example channel. Rename it for your purposes or remove it if you don't need it.";
+
+    $example_term = array(
+      'vid' => 1,
+      'name' => 'example tag',
+    );
+    taxonomy_save_term($example_term);
+    $node->taxonomy[] = $example_term['tid'];
+
+    node_save($node);
+  }
+}
+
+/**
+ * Override node callback. Invoked from mn_core.
+ *
+ * @todo Refactor, current architecture results in two same listings on node
+ * callback and on view callback; further results in weird interations between
+ * purl and listings.
+ */
+function mn_channels_node_page_view($node, $cid = NULL) {
+  if (isset($_GET['display']) && $_GET['display'] != 'default') {
+    drupal_goto('channel/'. $node->nid, 'display='. urlencode($_GET['display']));
+  }
+  $terms = array();
+  foreach ($node->taxonomy as $term) {
+    $terms[$term->tid] = $term->name;
+  }
+  drupal_set_title(t('News on @title', array('@title' => $node->title)));
+  if ($plugin = context_get_plugin('condition', 'node')) {
+    $plugin->execute($node, 'view');
+  }
+  $view = views_get_view('mn_channels_news');
+  $output = $view->execute_display('page_1', array($node->nid));
+  if ($view->total_rows != 0) {
+    return $output;
+  }
+  $output = '<div class="view-empty">';
+  $output .= '<p>'. t('There are no articles in this channel.') .'</p>';
+  if (user_access('edit data taxonomy relations')) {
+    $items = array(
+      t('Tag one or more articles with %terms to add them to this channel.', array('%terms' => implode(", ", $terms))),
+      t('!edit to change the tags that add an article to a channel.', array('!edit' => l(t('Edit the channel'), 'node/'. $node->nid .'/edit'))),
+    );
+    $output .= theme('item_list', $items);
+  }
+  $output .= '</div>';
+  return $output;
+}
+
+/**
+ * Implementation of hook_context_links_alter().
+ * Yank out the channel link from where it does not belong.
+ */
+function mn_channels_context_links_alter(&$links) {
+  if (isset($links['channel']) && !context_get('context', 'mn-section-channels')) {
+    unset($links['channel']);
+  }
+}
+
+/**
+ * Implementation of hook_feeds_after_clear().
+ */
+function mn_channels_feeds_after_clear($importer, $source) {
+  if ($importer->id == 'syndication') {
+    drupal_get_messages('status');
+    drupal_set_message(t('Deleted all items except those included in a channel.'));
+  }
+}
+
+/**
+ * Implementation of hook_data_delete_query_alter().
+ *
+ * Exempt items from deletion that are in channels.
+ */
+function mn_channels_data_delete_query_alter(DataQuery $query, $table_name) {
+  if ($table_name == 'feeds_data_syndication') {
+    // Acquire a 30 seconds lock for resetting the keep flag to avoid
+    // race conditions where an ongoing deletion process woul wipe out all
+    // items if it ran the query right after setting keep to 0 but before we get
+    // to set the keep flag to 1 for selected items.
+    if (lock_acquire('mn_core_reset_keep')) {
+      db_query("UPDATE {feeds_data_syndication} SET keep = 0");
+      lock_release('mn_core_reset_keep');
+    }
+    db_query("UPDATE {feeds_data_syndication} fs
+              JOIN {data_taxonomy} dt ON fs.id = dt.id
+                AND dt.data_table_name = 'feeds_data_syndication'
+              JOIN {term_node} tn ON dt.tid = tn.tid
+              JOIN {node} n ON tn.nid = n.nid
+                AND n.type = 'channel'
+              LEFT JOIN {votingapi_vote} v ON fs.id = v.content_id
+                AND content_type = 'feeds_data_syndication'
+                AND tag = 'trash'
+              SET fs.keep = 1
+              WHERE v.value IS NULL;");
+
+    $query->addWhere('feeds_data_syndication.keep = 0');
+  }
+}

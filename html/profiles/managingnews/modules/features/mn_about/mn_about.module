@@ -1,0 +1,62 @@
+<?php
+
+include_once('mn_about.features.inc');
+
+/**
+ * Implementation of hook_help().
+ */
+function mn_about_help($path, $arg) {
+  if (context_get('mn', 'section') === 'about' && node_access('create', 'book')) {
+    $output = "<p>";
+    $output .= t("You can use the <em>about section</em> to describe your site's purpose and provide background information on the news topics aggregated by this site. You can get started by !adding_pages to the about section.", array('!adding_pages' => l(t('adding new pages'), 'node/add/book')));
+    $output .= "</p>";
+    return $output;
+  }
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function mn_about_enable() {
+  // Create a new book node if there is no existing one (feature may be
+  // disabled and enabled again).
+  if (!variable_get('mn_about_nid', 0) || !db_result(db_query('SELECT nid FROM {node} WHERE nid = %d', variable_get('mn_about_nid', 0)))) {
+    global $user;
+    $node = new stdClass();
+    $node->uid = $user->uid;
+    $node->title = "About";
+    $node->type = 'book';
+    $node->body = "<h1>Enter about text here...</h1>\nYou can use the <em>about section</em> to describe your site's purpose and provide background information on the news topics aggregated by this site.";
+    $node->book['bid'] = 'new'; // A new book.
+    node_save($node);
+    variable_set('mn_about_nid', $node->nid);
+  }
+
+  // Now create a menu entry for it if it doesn't exist yet.
+  if (!variable_get('mn_about_mlid', 0)) {
+
+    $item = array();
+    $item['link_path'] = 'node/'. variable_get('mn_about_nid', 0);
+    $item['link_title'] = 'About';
+    $item['menu_name'] = 'features';
+    $item['weight'] = 20;
+    if ($mlid = menu_link_save($item)) {
+      drupal_set_message(t('Created book node for about section.'));
+      variable_set('mn_about_mlid', $mlid);
+    }
+    else {
+      drupal_set_message(t('Error creating menu for about section.'), 'error');
+    }
+  }
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function mn_about_disable() {
+  // Disable menu link.
+  if ($mlid = variable_get('mn_about_mlid', 0)) {
+    menu_link_delete($mlid);
+    variable_del('mn_about_mlid');
+  }
+}

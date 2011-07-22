@@ -1,0 +1,754 @@
+<?php
+
+include_once('mn_core.features.inc');
+
+/**
+ * Implementation of hook_help().
+ */
+function mn_core_help($path, $arg) {
+  switch ($path) {
+    case 'dashboard':
+      $actions = '';
+      $output = "<p>";
+      $output .= t("Welcome to !site_name.", array('!site_name' => variable_get('site_name', 'Drupal')));
+      $output .= "</p>";
+      if (user_access('administer site configuration')) {
+        $actions .= "<li>". t("Configure !home by using edit links on blocks and the 'Dashboard' button on the bottom right.", array('!home' => l(t('Home'), ''))) ."</li>";
+      }
+      $actions .= "<li>". t("Use the !feeds page to browse news by their source.", array('!feeds' => l(t('Feeds'), 'feeds'))) ."</li>";
+      if (module_exists('mn_search')) {
+        $actions .= "<li>". t("Use the !search page to search all articles.", array('!search' => l(t('Search'), 'search'))) ."</li>";
+      }
+      if (module_exists('mn_channels')) {
+        $actions .= "<li>". t("Use the !channels page to see a moderated selection of news.", array('!channels' => l(t('Channels'), 'channels'))) ."</li>";
+      }
+      $output .= "<ul>{$actions}</ul>";
+      return $output;
+    case 'feeds':
+      $output = "<p>";
+      $output .= t("<em>Feeds</em> shows the latest news items retrieved from the site's feeds. You can switch the display between articles, condensed list, and map display modes using the icons at the top right.");
+      $output .= "</p>";
+      $actions = '';
+      if (node_access('create', 'feed')) {
+        $actions .= "<li>". t("!add new RSS/Atom feeds to the site.", array('!add' => l(t('Add'), 'node/add/feed'))) ."</li>";
+      }
+      if (user_access('manage stored views')) {
+        $actions .= "<li>". t("!search the news and highlight saved searches on the frontpage.", array('!search' => l(t('Search'), 'search'))) ."</li>";
+      }
+      if (user_access('edit data taxonomy relations')) {
+        $actions .= "<li>". t("Organize items by tagging them and using the same tag on a !channel_node.", array('!channel_node' => l(t('Channel node'), 'channels'))) ."</li>";
+      }
+      if (!empty($actions)) {
+        $output .= "<ul>{$actions}</ul>";
+      }
+      return $output;
+    case 'import/opml':
+      return '<p>'. t('Import feeds from other aggregators via !opml format.', array('!opml' => l(t('OPML'), 'http://en.wikipedia.org/wiki/OPML'))) .'</p>';
+    case 'import/terms':
+      return '<p>'. t('Terms imported through this form will be used for automatic term extraction. Every incoming item will be automatically tagged with a term from this import if it occurs in the item\'s title or description.') .'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function mn_core_enable() {
+  // Increased weight allows altering the title of 'dashboard' menu item.
+  db_query("UPDATE {system} SET weight = 25 WHERE name = 'mn_core'");
+}
+
+/**
+ * Implementation of hook_cron().
+ */
+function mn_core_cron() {
+  // Make sure jake is enabled and caches are cleared. This toggle was
+  // introduced after various problems with uncleared caches with drush and
+  // update.php were discovered in the beta6 -> beta7 upgrade path.
+  if (variable_get('mn_core_clear_all_caches', FALSE) == TRUE) {
+    db_query("UPDATE {system} SET status = 1 WHERE type = 'theme' and name = 'jake'");
+    drupal_flush_all_caches();
+    variable_del('mn_core_clear_all_caches');
+  }
+  register_shutdown_function('mn_core_cron_log');
+}
+
+/**
+ * Implementation of hook_form_alter().
+ *
+ * The hook_form_[form_id]_alter() syntax is not used here as it will
+ * get called prior to Feeds.
+ */
+function mn_core_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'feed_node_form') {
+    $vid = db_result(db_query("SELECT vid FROM vocabulary WHERE module = 'features_tags'"));
+    if($vid) {
+      $form['taxonomy']['tags'][$vid]['#required'] = FALSE;
+      $form['taxonomy']['tags'][$vid]['#description'] = t('These tags will be automatically applied to all new stories on this feed.');
+    }
+    // Unset the URL field title.
+    unset($form['feeds']['FeedsHTTPFetcher']['source']['#title']);
+    // Make the description more specific.
+    $form['feeds']['FeedsHTTPFetcher']['source']['#description'] = t('Enter a URL to a valid RSS or Atom feed.');
+    // Instead, give its fieldset a nice title.
+    $form['feeds']['#title'] = t('Feed URL');
+    $form['feeds']['#title'] .= "\n<span class='form-required'>*</span>";
+    // Move it all the way up top.
+    $form['feeds']['#weight'] = -10;
+
+    // Hide the node's title field in a fieldset. This will expand if the title
+    // can't be populated from feed.
+    $title = $form['title'];
+    unset($title['#title']);
+    $form['title'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Title'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['title']['title'] = $title;
+
+    // Remove preview button on feed node form.
+    unset($form['buttons']['preview']);
+
+    // Prepopulate the Feed URL field from the 'url' GET variable used by the
+    // bookmarklet.
+    if (!empty($_GET['source']) && valid_url($_GET['source'], TRUE)) {
+      $form['feeds']['FeedsHTTPFetcher']['source']['#default_value'] = $_GET['source'];
+    }
+  }
+  else if ($form_id == 'system_site_information_settings') {
+    unset($form['front_page_title']);
+    if (feeds_importer('syndication')->export_type == EXPORT_IN_CODE) {
+      $placemaker_options = variable_get('placemaker', array());
+      $form['placemaker'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Yahoo Placemaker'),
+        '#collapsible' => FALSE,
+        '#tree' => TRUE,
+      );
+      $form['placemaker']['enabled'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use Yahoo Placemaker for geotagging feed items'),
+        '#default_value' => isset($placemaker_options['enabled']) ? $placemaker_options['enabled'] : FALSE,
+      );
+      $form['placemaker']['apikey'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Enter your Yahoo API key for use with Placemaker'),
+        '#default_value' => isset($placemaker_options['apikey']) ? $placemaker_options['apikey'] : '',
+      );
+      $form['placemaker']['language'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Enter the RFC 4646 code for the language of your content, if other than US English'),
+        '#default_value' => isset($placemaker_options['language']) ? $placemaker_options['language'] : '',
+      );
+    }
+  }
+  else if ($form_id == 'system_theme_settings') {
+    $form['designkit_image']['#collapsed'] =
+    $form['designkit_color']['#collapsed'] = FALSE;
+    $form['designkit_image']['#weight'] =
+    $form['designkit_color']['#weight'] = -10;
+  }
+}
+
+/**
+ * Implementation of hook_openlayers_alter().
+ *
+ * Add js file for openlayers translation if it exists the openlayers_lang
+ * libraries directory.
+ */
+function mn_core_openlayers_alter() {
+  global $language;
+  if ($language->language != 'en') {
+    $translation_file = libraries_get_path('openlayers_lang') . '/' . $language->language . '.js';
+    if (is_file($translation_file)) {
+      drupal_add_js($translation_file);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_imagecache_default_presets().
+ */
+function mn_core_imagecache_default_presets_alter($default_presets) {
+  $default_presets['designkit-image-wallpaper'] = array();
+}
+
+/**
+ * Implementation of hook_form_alter() for node_delete_confirm.
+ */
+function mn_core_form_node_delete_confirm_alter(&$form, $form_state) {
+  if (isset($form['nid']['#value']) && $node = node_load($form['nid']['#value'])) {
+    if ($plugin = context_get_plugin('condition', 'node')) {
+      $plugin->execute($node, 'form');
+    }
+  }
+}
+
+function mn_core_form_spaces_dashboard_editor_alter(&$form, $form_state) {
+  // Remove the dashboard selction box for the context editor form on dashboard
+  // pages.
+  if ($dashboard = context_get('spaces', 'dashboard')) {
+    unset($form['contexts'][$dashboard]['reaction-block']['layout']);
+  }
+}
+
+/**
+ * Preprocessor for theme_context_block_editable_region().
+ */
+function mn_core_preprocess_context_block_editable_region(&$vars) {
+  if (in_array($vars['region'], array('page_title', 'palette', 'page_tools', 'header'))) {
+    $vars['editable'] = FALSE;
+  }
+}
+
+/**
+ * Preprocessor for theme('context_block_browser').
+ */
+function mn_core_preprocess_context_block_browser(&$vars) {
+  if (count($vars['categories']['#options']) == 2) {
+    unset($vars['categories']['#options'][0]);
+  }
+}
+
+/**
+ * Implementation of hook_form_alter() for data_node_active_form.
+ *
+ * Remove extra form item label.
+ */
+function mn_core_form_data_node_active_form_alter(&$form, $form_state) {
+  unset($form['nid']['#title']);
+}
+
+/**
+ * Implementation of hook_context_default_contexts_alter().
+ */
+function mn_core_context_default_contexts_alter(&$contexts) {
+  // Alter default spaces_dashboard context to set the layout. Custom
+  // dashboards inherit this setting.
+  if (isset($contexts['spaces_dashboard'])) {
+    $contexts['spaces_dashboard']->reactions['block'] = array(
+      'blocks' => array(),
+      'layout' => 'twocolumn',
+    );
+  }
+}
+
+/**
+ * Implementation of hook_openlayers_behaviors().
+ *
+ * This is a ctools plugins hook.
+ */
+function mn_core_openlayers_behaviors() {
+  return array(
+    'mn_core_behavior_popup' => array(
+      'title' => t('MN custom popup'),
+      'type' => 'layer',
+      'behavior' => array(
+        'class' => 'mn_core_behavior_popup',
+        'parent' => 'openlayers_behavior',
+        'path' => drupal_get_path('module', 'mn_core') .'/behaviors',
+        'file' => 'mn_core_behavior_popup.inc',
+      ),
+    ),
+    'mn_core_behavior_scalepoints' => array(
+      'title' => t('MN scaled points'),
+      'type' => 'layer',
+      'behavior' => array(
+        'class' => 'mn_core_behavior_scalepoints',
+        'parent' => 'openlayers_behavior',
+        'path' => drupal_get_path('module', 'mn_core') .'/behaviors',
+        'file' => 'mn_core_behavior_scalepoints.inc',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function mn_core_block($op = 'list', $delta = 0) {
+  switch ($op) {
+    case 'list':
+      $blocks = array();
+      $blocks['admin']['info'] = t('MN: Admin menu');
+      $blocks['formats']['info'] = t('MN: Alternative formats');
+      $blocks['print']['info'] = t('MN: Print controls');
+      $blocks['clock']['info'] = t('MN: Clock');
+      $blocks['user']['info'] = t('MN: User controls');
+      $blocks['bookmarklet']['info'] = t('MN: Bookmarklet help');
+      return $blocks;
+    case 'view':
+      switch ($delta) {
+        case 'user':
+          global $user;
+          if ($user->uid) {
+            $links = array(
+              'user' => array(
+                'title' => t('Account settings'),
+                'href' => "user/{$user->uid}/edit",
+              ),
+              'logout' => array(
+                'title' => t('Log out'),
+                'href' => 'logout',
+              ),
+            );
+            return array(
+              'subject' => check_plain($user->name),
+              'content' => theme('links', $links, array('class' => 'menu')),
+            );
+          }
+          break;
+        case 'clock':
+          // If dateAPI exists, use a timezone location.
+          if (module_exists('date_api')) {
+            $time = date_format_date(date_now(), 'custom', 'g:ia F j');
+            $tz = str_replace('_', ' ', date_default_timezone_name());
+          }
+          // Otherwise fallback to a GMT offset display.
+          else {
+            $time = format_date(time(), 'custom', 'g:ia F j');
+            $offset = variable_get('date_default_timezone', 0);
+            $hours = floor(abs($offset / 3600));
+            $minutes = str_pad(abs($offset % 3600) / 60, 2, 0, STR_PAD_LEFT);
+            $tz = $offset >= 0 ? "+{$hours}:{$minutes} GMT" : "-{$hours}:{$minutes} GMT";
+          }
+          return array('content' => "<strong class='time'>{$time}</strong><small class='timezone'>{$tz}</small>");
+        case 'print':
+          $block = array();
+          if (isset($_GET['print'])) {
+            $block['content'] = "<div class='back-link'>";
+            $block['content'] .= l(t('Back to site'), $_GET['q'], array('query' => drupal_query_string_encode($_GET, array('q', 'print'))));
+            $block['content'] .= "</div>";
+            $block['content'] .= drupal_get_form('mn_core_print_controls');
+          }
+          return $block;
+        case 'admin':
+          $links = array();
+          $paths = mn_core_admin_paths();
+          foreach (array_keys($paths) as $path) {
+            $item = menu_get_item($path);
+            if ($item['access']) {
+              $class = module_exists('seed') ? seed_id_safe($item['title']) : str_replace('/', '-', $path);
+              $links[$class] = $item;
+            }
+          }
+          $output = theme('links', $links, array('class' => 'menu'));
+          return array('subject' => t('Admin'), 'content' => $output);
+        case 'formats':
+          if ($view = views_get_page_view()) {
+            // Prepare a page query string to passthru alt. format links.
+            $query = $_GET;
+            if (isset($query['q'])) {
+              unset($query['q']);
+            }
+            if (isset($query['page'])) {
+              unset($query['page']);
+            }
+
+            $links = array();
+            $view = $view->view;
+            foreach ($view->display as $display_id => $display) {
+              // For each feed that is attached to current display, add link
+              if ($display->display_plugin == 'feed') {
+                $displays = $display->handler->get_option('displays');
+                if (!empty($displays[$view->current_display])) {
+                  // Clone the view and use the ->get_url() method to preserve/replace args correctly.
+                  $feed_view = $view->clone_view();
+                  $feed_view->set_display($display_id);
+                  $path = $feed_view->get_url();
+                  $feed_view->destroy();
+
+                  $links[$display_id] = array(
+                    'title' => '<span class="icon"></span>'. t($display->display_title),
+                    'href' => $path,
+                    'html' => TRUE,
+                    'query' => $query,
+                  );
+                }
+              }
+            }
+            $links['print'] = array(
+              'title' => '<span class="icon"></span>'. t('Print'),
+              'href' => $_GET['q'],
+              'html' => TRUE,
+              'query' => $query + array('print' => 1),
+            );
+            $output = theme('links', $links, array('class' => 'links formats'));
+            return array('content' => $output);
+          }
+          break;
+        case 'bookmarklet':
+          $output = _mn_core_block_bookmarklet();
+          return array('subject' => t('Bookmarklet'), 'content' => $output);
+          break;
+      }
+      break;
+  }
+}
+
+/**
+ * Block with instructions for using the bookmarklet.
+ */
+function _mn_core_block_bookmarklet() {
+  $url = url('node/add/feed', array('absolute' => TRUE));
+  $script = 'javascript:location.href="' . $url . '?source="+encodeURIComponent(location.href);';
+
+  $output = "<p>" . t("This bookmarklet makes it easy to add more feeds to your site. Drag the following link into your browser's bookmarks bar to install it.") . "</p>";
+  $output .= "<div class='bookmarklet'><a href='$script'>" . t('Add to @site_name', array('@site_name' => variable_get('site_name', 0))) . '</a></div>';
+
+  return $output;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function mn_core_perm() {
+  return array('administer mn');
+}
+
+/**
+ * Implementation of hook_user().
+ * Add a flag for displaying the initial MN welcome message for new users.
+ */
+function mn_core_user($op, &$edit, &$account, $category = NULL) {
+  if ($op === 'insert') {
+    $edit['mn_welcome'] = TRUE;
+  }
+}
+
+/**
+ * Implementation of hook_data_views_handlers_alter().
+ */
+function mn_core_data_views_handlers_alter(&$handlers) {
+  $handlers['field']['mn_core_handler_field'] = 'mn_core_handler_field';
+}
+
+/**
+ * Provide a list of admin paths allowed for MN administrators.
+ *
+ * If a value is provided in each key-value pair, it will be used to
+ * override the default menu item title.
+ */
+function mn_core_admin_paths() {
+  $paths = array(
+    'admin/settings/site-information' => '',
+    'admin/settings/date-time' => '',
+    'admin/build/themes/settings/jake' => 'Theme settings',
+    'admin/user/user' => '',
+    'admin/build/features' => '',
+    'admin/settings/openlayers' => '',
+    'import/opml' => 'Import OPML',
+    'import/terms' => 'Automatic term extraction',
+  );
+
+  drupal_alter('mn_core_admin_paths', $paths);
+
+  return $paths;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function mn_core_menu_alter(&$items) {
+  // Rename Dashboard menu item to 'Home.'
+  $items['dashboard']['title'] = 'Home';
+  $items['dashboard']['weight'] = '-5';
+
+  // Rename Delete items to Delete terms for clarity.
+  $items['import/terms/delete-items']['title'] = t('Delete terms');
+
+  $items['node/%node']['page callback'] = 'mn_core_node_page_router';
+
+  // Poke access holes into menu tree for MN-relevant admin pages.
+  $admin_paths = mn_core_admin_paths();
+  foreach ($items as $path => $item) {
+    foreach ($admin_paths as $admin_path => $title) {
+      if ($path == $admin_path || strpos($path, $admin_path .'/') === 0) {
+        if (!empty($title) && $path == $admin_path) {
+          $items[$path]['title'] = $title;
+        }
+        $items[$path]['access callback'] = 'user_access';
+        $items[$path]['access arguments'] = array('administer mn');
+      }
+    }
+  }
+
+  // This callback we don't want to show in the menu.
+  $items['admin/reports/status/run-cron']['access callback'] = 'user_access';
+  $items['admin/reports/status/run-cron']['access arguments'] = array('administer mn');
+
+  // Swap out 403.
+  if (isset($items['access-denied'])) {
+    $items['access-denied']['page callback'] = 'mn_core_403';
+  }
+}
+
+/**
+ * Implementation of hook_spaces_dashboard_block_access_alter().
+ */
+function mn_core_spaces_dashboard_block_access_alter(&$access) {
+  // Hide custom trash box from trash menu
+  $access['boxes-trash'] = FALSE;
+  // Mannually hide the 'add' block for mn_boxes_default. Boxes module assumes
+  // that all 'add' blocks should be visible, but this block comes from a
+  // plugin that is an abstract class.
+  $access['boxes-boxes_add__mn_boxes_default'] = FALSE;
+}
+
+/**
+ * Re route certain node types.
+ */
+function mn_core_node_page_router($node, $cid = NULL) {
+  if ($node->type == 'feed' && function_exists('mn_core_node_page_view')) {
+    return mn_core_node_page_view($node, $cid);
+  }
+  else if ($node->type == 'channel' && function_exists('mn_channels_node_page_view')) {
+    return mn_channels_node_page_view($node, $cid);
+  }
+  return node_page_view($node, $cid);
+}
+
+/**
+ * Node page callback.
+ */
+function mn_core_node_page_view($node, $cid) {
+  menu_set_active_item("feeds/{$node->nid}");
+  return menu_execute_active_handler("feeds/{$node->nid}");
+}
+
+/**
+ * Printing stack =====================================================
+ */
+
+/**
+ * Print controls block.
+ */
+function mn_core_print_controls(&$form_state) {
+  $form = array();
+  $form['query'] = array('#type' => 'value', '#value' => $_GET);
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Page title'),
+    '#size' => 20,
+    '#default_value' => isset($_GET['title']) ? $_GET['title'] : drupal_get_title(),
+  );
+  $form['items_per_page'] = array(
+    '#type' => 'select',
+    '#title' => t('Stories'),
+    '#options' => drupal_map_assoc(array(25, 50, 75, 100, 200, 500)),
+    '#default_value' => isset($_GET['items_per_page']) ? $_GET['items_per_page'] : 25,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+  );
+  return $form;
+}
+
+/**
+ * Print controls submit handler.
+ */
+function mn_core_print_controls_submit(&$form, &$form_state) {
+  $query = $form_state['values']['query'];
+  $query['title'] = $form_state['values']['title'];
+  $query['items_per_page'] = $form_state['values']['items_per_page'];
+  drupal_goto($query['q'], drupal_query_string_encode($query, array('q')));
+}
+
+/**
+ * Implementation of hook_views_pre_execute().
+ */
+function mn_core_views_pre_execute(&$view) {
+  if (isset($_GET['print']) && $view->display_handler->display->display_plugin == 'page') {
+    if (!empty($_GET['items_per_page']) && is_numeric($_GET['items_per_page'])) {
+      $view->set_items_per_page($_GET['items_per_page']);
+    }
+    if (isset($_GET['title'])) {
+      drupal_set_title(t($_GET['title']));
+    }
+  }
+}
+
+/**
+ * 403 page.
+ */
+function mn_core_403() {
+  global $user;
+  if ($user->uid) {
+    return "<div class='access-denied'>". t('You are not authorized to access this page. Ask the site administrator for the appropriate permissions to view this page.') ."</div>";
+  }
+  else {
+    return "<div class='access-denied'>". t('You are not authorized to access this page. If you have a user account on the site !login. If you !forgotpassword.', array('!login' => l(t('please login'), 'user/login'), '!forgotpassword' => l(t('forgot your password go here'), 'user/password'))) ."</div>";
+  }
+}
+
+/**
+ * Preprocessor for theme('page').
+ * Show welcome helptext on initial login/site view.
+ */
+function mn_core_preprocess_page(&$vars) {
+  global $user;
+  if (!empty($user->mn_welcome) && arg(0) == 'dashboard') {
+    $vars['body_classes'] .= ' help';
+    user_save($user, array('mn_welcome' => NULL));
+  }
+}
+
+/**
+ * Preprocessor for theme('views_view').
+ */
+function mn_core_preprocess_views_view(&$vars) {
+  // Use helptext if available for empty text in views.
+  // Empty text is only displayed if
+  // - This is a page view.
+  // - There is no explicitly defined empty text.
+  // - There are no views rows.
+  // - There are no search filters set the may have caused this page to be empty.
+  if (empty($vars['rows']) && $vars['view']->display_handler->display->display_plugin == 'page' && empty($vars['view']->exposed_input['search']) && empty($vars['empty'])) {
+    if ($help = menu_get_active_help()) {
+      $vars['empty'] = "<div class='views-help prose clear-block'>{$help}</div>";
+    }
+  }
+}
+
+/**
+ * Alter default syndication importer if Placemaker is being used for geotagging.
+ */
+function mn_core_feeds_importer_default_alter($importer){
+  $placemaker_options = variable_get('placemaker', '');
+  if (!empty($placemaker_options['enabled'])) {
+    $importer['syndication']->config['parser']['config']['extractors'] = 'placemaker';
+    $importer['syndication']->config['parser']['config']['language'] = $placemaker_options['language'];
+    $importer['syndication']->config['parser']['config']['placemaker_key'] = $placemaker_options['apikey'];
+  }
+}
+
+/**
+ * Preprocessor for theme('views_view_fields').
+ *
+ * Provides some interesting templating rules for Views provided by MN to make themers' lives easier.
+ */
+function mn_core_preprocess_views_view_fields(&$vars) {
+  $view = $vars['view'];
+  if ($view->tag == 'mn') {
+    $display_plugin = $view->display_handler->display->display_plugin;
+    if (in_array($display_plugin, array('page', 'block', 'web_widgets')) && $view->base_table == 'feeds_data_syndication') {
+      $vars['template_files'][] = 'mn-feeditem';
+
+      // If there is a URL field present offer templating options based on URLs.
+      if (isset($view->field['config']) && $url = $view->field['config']->render($vars['row'])) {
+        if ($domain = mn_core_get_domain($url)) {
+          $domain = explode('-', $domain);
+          while (count($domain) > 1) {
+            $vars['template_files'][] = "mn-feeditem-". implode('-', $domain);
+            array_shift($domain);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper function which returns a css-id safe domain name from a valid URL.
+ */
+function mn_core_get_domain($url) {
+  $matches = array();
+  preg_match("/^(https?):\/\/([a-z0-9\-\.]*)/i", $url, $matches);
+  if (isset($matches[2])) {
+    $domain = strtr($matches[2], array('www.' => ''));
+    $domain = str_replace('.', '-', $domain);
+    return $domain;
+  }
+  return FALSE;
+}
+
+/**
+ * Log memory usage and script run time on cron time
+ */
+function mn_core_cron_log() {
+  if (function_exists('memory_get_peak_usage')) {
+    $peak = number_format(memory_get_peak_usage(TRUE) / 1024 / 1024, 2);
+    watchdog('MN Core', 'Peak memory usage on cron !peak M.', array('!peak' => $peak));
+  }
+  $time = number_format(timer_read('page') / 1000, 2);
+  watchdog('MN Core', 'Page execution time on cron !time s.', array('!time' => $time));
+}
+
+/**
+ * Implementation of hook_theme_registry_alter().
+ */
+function mn_core_theme_registry_alter(&$theme_registry) {
+  $theme_registry['textfield']['function'] = 'mn_core_textfield';
+}
+
+/**
+ * Override of theme_textfield().
+ *
+ * Disables PURL modifications on autocomplete callback URLs, which break the
+ * autocomplete behavior.
+ */
+function mn_core_textfield($element) {
+  // Add fluid class like the rubik_textfield() override does.
+  if ($element['#size'] >= 30 || $element['#maxlength'] >= 30) {
+    $element['#size'] = '';
+    $element['#attributes']['class'] = isset($element['#attributes']['class']) ? "{$element['#attributes']['class']} fluid" : "fluid";
+  }
+
+  $size = empty($element['#size']) ? '' : ' size="'. $element['#size'] .'"';
+  $maxlength = empty($element['#maxlength']) ? '' : ' maxlength="'. $element['#maxlength'] .'"';
+  $class = array('form-text');
+  $extra = '';
+  $output = '';
+
+  if ($element['#autocomplete_path'] && menu_valid_path(array('link_path' => $element['#autocomplete_path']))) {
+    drupal_add_js('misc/autocomplete.js');
+    $class[] = 'form-autocomplete';
+
+    // Disabled PURL by adding option into url() call below.
+    $extra =  '<input class="autocomplete" type="hidden" id="'. $element['#id'] .'-autocomplete" value="'. check_url(url($element['#autocomplete_path'], array('absolute' => TRUE, 'purl' => array('disabled' => TRUE)))) .'" disabled="disabled" />';
+  }
+  _form_set_class($element, $class);
+
+  if (isset($element['#field_prefix'])) {
+    $output .= '<span class="field-prefix">'. $element['#field_prefix'] .'</span> ';
+  }
+
+  $output .= '<input type="text"'. $maxlength .' name="'. $element['#name'] .'" id="'. $element['#id'] .'"'. $size .' value="'. check_plain($element['#value']) .'"'. drupal_attributes($element['#attributes']) .' />';
+
+  if (isset($element['#field_suffix'])) {
+    $output .= ' <span class="field-suffix">'. $element['#field_suffix'] .'</span>';
+  }
+
+  return theme('form_element', $element, $output) . $extra;
+}
+
+
+/**
+ * Implementation of hook_views_pre_build().
+ */
+function mn_core_views_pre_build(&$view) {
+  if (!module_exists('simpleshare')) {
+    return;
+  }
+  if ($view->base_table == 'feeds_data_syndication' && get_class($view->display_handler) == 'views_plugin_display_page' || get_class($view->display_handler) == 'views_modes_plugin_display_mode') {
+    $fields = $view->display_handler->get_option('fields');
+    if (empty($fields['simpleshare_link'])) {
+      $fields['simpleshare_link'] = array(
+        'url' => '[url]',
+        'text' => '[title]',
+        'exclude' => '',
+        'link_text' => t('Share'),
+        'id' => 'simpleshare_link',
+        'table' => 'views',
+        'field' => 'simpleshare_link',
+        'override' => array(
+          'button' => 'Override',
+        ),
+        'relationship' => 'none',
+      );
+      $view->display_handler->set_option('fields', $fields);
+    }
+  }
+}

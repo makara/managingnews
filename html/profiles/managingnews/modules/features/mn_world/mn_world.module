@@ -1,0 +1,83 @@
+<?php
+
+include_once('mn_world.features.inc');
+
+/**
+ * Implementation of hook_enable().
+ *
+ * @todo: move this to a features_rebuild() callback.
+ */
+function mn_world_enable() {
+  $file = 'mn_world.csv';
+  $path = file_directory_path() . '/locations';
+  if (file_check_directory($path, TRUE)) {
+    $filepath = "{$path}/{$file}";
+
+    // Copy locations csv to file directory, avoid using shell_exec() for
+    // compatibility reasons.
+    if (!file_exists($filepath)) {
+      $src = file_get_contents(drupal_get_path('module', 'mn_world') . "/{$file}");
+      file_put_contents($filepath, $src);
+    }
+
+    // This variable is strongarmed by mn_core, but it is not available in time
+    // for this routine and it's required to be. We set it manually.
+    variable_set('geotaxonomy_vocabularies', array('features_tags' => 1));
+
+    // Force exported vocabularies to be created so terms can be imported into
+    // them.
+    features_include();
+    module_load_include('inc', 'features', 'features.export');
+    taxonomy_features_rebuild('mn_core');
+
+    // Import file, clear caches to verify to make sure 'locations' importer
+    // is available when installing with Aegir.
+    ctools_include('export');
+    ctools_export_load_object_reset('feeds_importer');
+    try {
+      // Ensure importer exists.
+      feeds_importer('terms')->existing();
+      $source = feeds_source('terms');
+      $source->addConfig(
+        array(
+          'FeedsFileFetcher' => array(
+            'source' => $filepath
+          ),
+        )
+      );
+      while (FEEDS_BATCH_COMPLETE != $source->import());
+    }
+    catch (Exception $e) {
+      drupal_set_message(t('Could not import geo terms. Please import them manually from mn_world.csv in files directory.'));
+    }
+  }
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * @todo: move this to a features_rebuild() callback.
+ */
+function mn_world_disable() {
+  // Dump all items from locations importer.
+  $source = feeds_source('locations');
+  $source->clear();
+}
+
+/**
+ * Implementation of hook_mn_openlayers_map_alter().
+ */
+function mn_world_openlayers_map_preprocess_alter(&$map) {
+  // Ensure that default map preset has interface icons in the admin pages.
+  if(empty($map['image_path'])) {
+    $map['image_path'] = 'http://js.mapbox.com/theme/dark/';
+  }
+  // Change the map for print views.
+  if ($_GET['print']) {
+    // Disable the layerswitcher
+    unset($map['behaviors']['openlayers_behavior_layerswitcher']);
+    // Switch to world print.
+    $map['layers']['world_print'] =
+    $map['default_layer'] = 'world_print';
+  }
+}

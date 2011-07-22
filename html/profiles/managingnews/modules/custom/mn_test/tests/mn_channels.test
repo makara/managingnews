@@ -1,0 +1,35 @@
+<?php
+// $Id$
+
+require_once drupal_get_path('module', 'mn_test') . '/mn_web_test_case.php';
+
+class MNChannelsTestCase extends MnWebTestCase {
+  /**
+   * Describe this test.
+   */
+  public function getInfo() {
+    return array(
+      'name' => t('MN Channels'),
+      'description' => t('Test channels functionality.'),
+      'group' => t('Managing News'),
+    );
+  }
+
+  /**
+   * Set up.
+   */
+  public function setUp() {
+    parent::setUp();
+    $this->loginAdmin();
+  }
+
+  public function test() {
+    // Determine if the Example channel is configured correctly.
+    $channel_title = db_result(db_query("SELECT title FROM {node} WHERE type = 'channel'"));
+    $this->assertEqual($channel_title, 'Example channel', 'Found example channel.');
+    $nid = db_result(db_query("SELECT nid FROM {node} WHERE type = 'channel'"));
+    $node = node_load($nid);
+    $this->assertEqual(current($node->taxonomy)->name, 'example tag', 'Example tag found on example channel.');
+  }
+
+}
